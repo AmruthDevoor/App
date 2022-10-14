@@ -3,7 +3,8 @@ import React from "react";
 import Header from "../AppHeader";
 import { Card, Headline, Paragraph } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
-const { width, height} = Dimensions.get("window");
+import Footer from "./Footer";
+const { width, height} = Dimensions.get("screen");
 const Notifications = () => {
   return (
     <View style={Styles.container}>
@@ -49,6 +50,10 @@ const Notifications = () => {
           </Card.Content>
         </Card>
       </View>
+      <View style={Styles.Footer}>    
+          <Footer/>
+          </View>
+
     </View>
   );
 };
@@ -57,15 +62,20 @@ export default Notifications;
 const Styles = StyleSheet.create({
   container: {
     backgroundColor: "#f6f9ff",
+    height:height,
+    width:width,
    
 
+  },
+  Footer:{
+marginTop:width-580
   },
   Card: {
     alignContent: "center",
     margin: 10,
-    marginLeft:35,
-    height: 100,
-    width: width-80,
+    marginLeft:10,
+    height: height*0.115,
+    width: width-30,
     zIndex: -1,
    
     borderWidth: 1,

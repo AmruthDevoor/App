@@ -6,19 +6,34 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../AppHeader";
-import CreateCard from "../Cards/CreateCard";
-import CreateCard1 from "../Cards/CreateCard1";
-import CreateCard2 from "../Cards/CreateCard2";
-import CreateCard3 from "../Cards/CreateCard3";
+import CreateCard from "../Cards/ProductCard";
+import CreateCard1 from "../Cards/MaterialCard";
+import CreateCard2 from "../Cards/RequestCard";
+import CreateCard3 from "../Cards/LeaveCard";
 import Footer from "./Footer";
-import CreateCard4 from "../Cards/CreateCard4";
-import CreateCard5 from "../Cards/CreateCard5";
+import { Card } from "react-native-paper";
+
+import CreateCard4 from "../Cards/CollectionCard";
+import CreateCard5 from "../Cards/TaskCard";
+import axios from "axios";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import PlantHealthCard from "../Cards/PlantHealthCard";
+// import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
 
 const HomeScreen = () => {
+  const [noTotalService, setNoTotalService] = useState("");
+  const [noTotalCollection,setNoTotalCollection] = useState("");
+  const [noTotlaPlantHealth,setNoTotalPlantHealth] = useState("");
+  const [noTasks, setNoTasks] = useState("");
+  const [noCollection, setNoCollection] = useState("");
+  const [noPlantHealth,setNoPlantHealth] = useState("")
+  const [techId, setTechId] = useState("");
+  const [accessToken, setAccessToken] = useState("");
   const navigation = useNavigation();
   const onAbout = () => {
     navigation.navigate("About");
@@ -26,69 +41,126 @@ const HomeScreen = () => {
   const onSettingScreen = () => {
     navigation.navigate("SettingScreen");
   };
+  useEffect(() => {
+    AsyncStorage.getItem("id").then((value) => {
+      setTechId(value);
+    });
+    AsyncStorage.getItem("AccessToken").then((value) => {
+      setAccessToken(JSON.parse(value));
+    });
+
+    noOfTasksAndCollection();
+  }, [accessToken]);
+  const noOfTasksAndCollection = () => {
+    axios({
+      method: "GET",
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/dashboard/v1/technicianDashboardPendingCount/{technicianId}?technicianId=${techId}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((result) => {
+      setNoCollection(result.data.pendingCollectionCount);
+      setNoTasks(result.data.pendingTaskCount);
+      setNoPlantHealth(result.data.pendingPlantHealthCount);
+   
+
+    });
+  };
+
+
+  useEffect(() => {
+    AsyncStorage.getItem("id").then((value) => {
+      setTechId(value);
+    });
+    AsyncStorage.getItem("AccessToken").then((value) => {
+      setAccessToken(JSON.parse(value));
+    });
+
+    totalCount();
+  }, [accessToken]);
+  const totalCount = () => {
+    axios({
+      method: "GET",
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/dashboard/v1/technicianDashboardCount/{technicianId}?technicianId=${techId}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((result) => {
+      setNoTotalService(result.data.totalTaskCount);
+      setNoTotalCollection(result.data.totalCollectionTaskCount);
+      setNoTotalPlantHealth(result.data.totalPlantHealthTaskCount);
+   
+
+    });
+  };
+
   return (
-
     <View style={styles.container}>
-        
       <Header />
-
-      <View style={{ zIndex: -1 }}>
-        {/* <Button style={styles.button} title="about" onPress={onAbout} />
+      <ScrollView style={styles.main1}>
+        <View style={{ zIndex: -1 }}>
+          {/* <Button style={styles.button} title="about" onPress={onAbout} />
     <Button style={styles.button} title="SettingScreen" onPress={onSettingScreen} /> */}
-        <View style={styles.card}>
-          <CreateCard />
-          <CreateCard1 />
-        </View>
+          <View style={styles.card}>
+            <CreateCard no={noTotalService} />
+            <CreateCard1  no={noTotalCollection}/>
+          </View>
 
-        <View style={styles.card1}>
-          <CreateCard2 />
-          <CreateCard3 />
-        </View>
+          <View style={styles.card1}>
+            <CreateCard2 no={noTotlaPlantHealth} />
+            <CreateCard3 />
+          </View>
 
-        <View>
-          <CreateCard4 />
-          <CreateCard5 />
+          <View>
+            <CreateCard4 no={noCollection} />
+            <CreateCard5 no={noTasks} />
+            <Text></Text>
+            <Text></Text>
+            <PlantHealthCard no={noPlantHealth} />
+          </View>
         </View>
-        <View style={styles.footer}>
-          <Footer />
-        </View>
+      </ScrollView>
+      <View style={styles.footer}>
+        <Footer />
       </View>
-      
     </View>
-    
   );
 };
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  main1: {
+    backgroundColor: "#f6f9ff",
+    zIndex: -1,
+  },
+
   container: {
     position: "relative",
-    zIndex: 100,
-    height: height*1.045,
-    width: width ,
-   
-    
+    display: "flex",
+    height: Dimensions.get("screen").height + 430,
+    width: Dimensions.get("screen").width,
   },
   button: {
+    display: "flex",
+    position: "absolute",
     backgroundColor: "black",
     paddingRight: 20,
-    width: width
+    width: width,
   },
   card: {
     flexDirection: "row",
     marginLeft: -10,
-    width: width
   },
   card1: {
     flexDirection: "row",
     marginLeft: -10,
-    width: width-200,
-    
   },
   footer: {
-    top: -250,
-    paddingTop:height*-3,
-    
+    position: "relative",
+    top: -460,
+    paddingTop: height * -3,
   },
 });

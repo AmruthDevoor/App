@@ -25,26 +25,29 @@ const FormContainer = ({ children }) => {
     </KeyboardAvoidingView>
   );
 };
-const { height } = Dimensions.get("window");
+const { height,width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     borderStyle:"solid",
     borderColor: "black",
+    
   },
   logo: {
-    height: 170,
-    width: 170,
-    marginBottom: 20,
-    marginLeft:33,
+    height: height*0.19,
+    width: width*0.5,
+    marginBottom: height*0.01,
+    marginLeft:width*0.07,
     marginTop: height * 0.15,
     alignSelf: "center",
     
   },
   Card:{
-    marginTop: 50,
-    padding:10,
+    marginTop: height*0.07,
+    paddingTop:height*0.04,
+    padding:width*0.04,
+   
   }
 });
 export default FormContainer;

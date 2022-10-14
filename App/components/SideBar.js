@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Card, Button, Title, Paragraph } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 const SideBar = () => {
+  const [on,seton]=useState(false);
+  const [off,setoff]=useState(false);
   const navigation = useNavigation();
   const onDashboard = () => {
     navigation.navigate("HomeScreen");
@@ -35,8 +37,17 @@ const SideBar = () => {
   const onLogout = () => {
     navigation.navigate("Login");
   };
+  const onPlantHealth = () => {
+    navigation.navigate("PlantTask");
+  };
+ 
   return (
     <Card style={Styles.container}>
+    
+      <Card   style={Styles.container1 } >
+
+      </Card>
+     
       <Card.Content>
         <TouchableOpacity onPress={onDashboard} style={Styles.content}>
           <MaterialIcons
@@ -63,7 +74,16 @@ const SideBar = () => {
             size={25}
             color="#0073A9"
           />
-          <Text style={Styles.text}>Task </Text>
+             <Text style={Styles.text}>Tasks </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onPlantHealth} style={Styles.content}>
+          <MaterialIcons
+            style={Styles.icon}
+            name="inventory"
+            size={25}
+            color="#0073A9"
+          />
+          <Text style={Styles.text}>Plant Health </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onStock} style={Styles.content}>
           <MaterialIcons
@@ -77,7 +97,7 @@ const SideBar = () => {
         <TouchableOpacity onPress={onProductRequest} style={Styles.content}>
           <MaterialIcons
             style={Styles.icon}
-            name="check-box-outline-blank"
+            name="shopping-cart"
             size={25}
             color="#0073A9"
           />
@@ -86,7 +106,7 @@ const SideBar = () => {
         <TouchableOpacity onPress={onMaterial} style={Styles.content}>
           <MaterialIcons
             style={Styles.icon}
-            name="add-circle"
+            name="add-shopping-cart"
             size={25}
             color="#0073A9"
           />
@@ -133,6 +153,7 @@ const SideBar = () => {
       </Card.Content>
 
       <Card.Actions></Card.Actions>
+     
     </Card>
   );
 };
@@ -151,6 +172,21 @@ const Styles = StyleSheet.create({
     position: "absolute",
     top: 43,
     left: -35,
+  },
+  container1:{
+    alignContents: "center",
+    margin: 37,
+
+    height: 800,
+    width: 170,
+   paddingLeft:10,
+    backgroundColor: "white",
+    zIndex: 1,
+    position: "absolute",
+    top: -38,
+    opacity: 0.2,
+    left: 187,
+
   },
   content: {
     height:65,

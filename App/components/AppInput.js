@@ -14,17 +14,17 @@ const AppInput = ({value, placeholder, onChange, ...rest}) => {
 
   )
 }
-const {width} = Dimensions.get('window');
+const {width,height} = Dimensions.get('window');
 const styles = StyleSheet.create({
     input: {
-        width: width - 40,
-        height:50,
+        width: width *0.9,
+        height:height*0.065,
         backgroundColor: "#EAE9E7",
         fontSize: 20,
         paddingHorizontal: 15,
         borderRadius: 8,
         color: "black",
-        marginBottom: 20,
+        marginBottom: height*0.01,
        
       },
       
