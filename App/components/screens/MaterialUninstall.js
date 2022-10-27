@@ -58,7 +58,7 @@ import {
           Authorization: "Bearer " + accessToken,
         },
       }).then((result) => {
-        console.warn(result.data.content);
+       // console.warn(result.data.content);
       
         setProductInstall(result.data.content);
       });

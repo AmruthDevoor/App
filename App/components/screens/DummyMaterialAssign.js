@@ -1,19 +1,15 @@
-
-
-
-
 import {
   View,
   StyleSheet,
   Text,
   Button,
   ScrollView,
-  RefreshControl,
   Dimensions,
   TouchableOpacity,
   Pressable,
   SafeAreaView,
   FlatList,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
@@ -30,25 +26,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
-const wait = (timeout) => {
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
-const MaterialRequest = () => {
-  const navigation = useNavigation();
-  const onReq = () => {
-    navigation.navigate("MatReqAdd");
-  };
+
+const MaterialAssign = () => {
+  
   const [techId, setTechId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPages, setTotalPages] = useState(10);
   const [pageSize, setPageSize] = useState(5);
-  const [MaterialRequest, setMaterialRequest] = useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    wait(1000).then(() => setRefreshing(false));
-  }, []);
+  const [MaterialAssign, setMaterialAssign] = useState([]);
+
   useEffect(() => {
     AsyncStorage.getItem("id").then((value) => {
       setTechId(value);
@@ -58,33 +45,33 @@ const MaterialRequest = () => {
       setAccessToken(JSON.parse(value));
     });
 
-    getMaterialRequest();
-  }, [accessToken,pageNumber,MaterialRequest]);
+    getMaterialAssign();
+  }, [accessToken,pageNumber]);
 
-  const getMaterialRequest = () => {
+  const getMaterialAssign = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialrequest/v1/getRequestedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialassign/v1/getAssignedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
       },
     }).then((result) => {
-
+      console.warn(result.data);
       setTotalPages(result.data.totalPages);
 
-      setMaterialRequest(result.data.content);
+      setMaterialAssign(result.data.content);
     });
   };
 
   const handlePreviousPage = () => {
-   // console.warn("previous page clicked", pageNumber)
+    console.warn("previous page clicked", pageNumber)
     // Do this so your page can't go negative
     setPageNumber(pageNumber-1)
 }
 
 const handleNextPage = () => {
-    //console.warn("next page clicked"+ " "+ (pageNumber+1))
+    console.warn("next page clicked"+ " "+ (pageNumber+1))
     setPageNumber(pageNumber + 1)
 
     
@@ -94,17 +81,35 @@ const viewItem = ({item}) => {
   return (
       <View >
      <Card style={styles.card}>
-      <Card.Content >   
-     <Text style={styles.header}>{item.materialDto===null ? "No material name":item.materialDto.materialName}</Text>
+      <View style={{flexDirection:"row"}} >
+      <Card.Content   >   
+     <Text style={styles.header}>
+      {item.materialDto.materialName==="" ? "No header":item.materialDto.materialName}
+       <MaterialIcons name="info" size={20} color="#0073A9"  />
+     </Text>
+  
+                     
+                  
      </Card.Content>
     
-     <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>Quantity : {item.quantity}</Text>
+     </View>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>quantity {item.newQuantity}</Text>
      </Card.Content>
-     <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>Remark :{"\n"} {item.remark}</Text>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>Handover by : {item.handoverBy}</Text>
      </Card.Content>
-   
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>Date : {moment ( item.insertedDate).format("L")}</Text>
+     </Card.Content>
+     <View style={{flexDirection:"row", marginLeft:200,marginTop:-120,marginBottom:10}}>
+                                  <Card.Content >
+                 <Image source = {require("../../assets/noImage.jpg")} style={{width:130,height:130}} />
+                 </Card.Content>
+                 </View>
+     
+    
+
      
      </Card>
 
@@ -115,20 +120,12 @@ const viewItem = ({item}) => {
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView style={styles.main1} 
-       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      }>
+      <ScrollView style={styles.main1}>
         <View style={{ zIndex: -1 }}>
-          <Text style={styles.head}>Requested Material</Text>
-          <Pressable onPress={onReq} style={styles.submit}>
-            <Text style={styles.btnText}>Request</Text>
-          </Pressable>
+          <Text style={styles.head}>Assigned Material</Text>
+        
 
-          {/* {MaterialRequest.map((LeaveReq) => {
+          {/* {MaterialAssign.map((LeaveReq) => {
             return (
               <ScrollView>
                 <Card style={styles.card}>
@@ -173,7 +170,7 @@ const viewItem = ({item}) => {
           })} */}
            <SafeAreaView>
           <FlatList
-              data={MaterialRequest}
+              data={MaterialAssign}
               renderItem={viewItem}
               // ListHeaderComponent={ListHeader}
               keyExtractor={(item, index) => index.toString()}
@@ -229,7 +226,7 @@ const viewItem = ({item}) => {
   );
 };
 
-export default MaterialRequest;
+export default MaterialAssign;
 
 const styles = StyleSheet.create({
   main1: {
@@ -281,13 +278,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     fontSize: 20,
     fontWeight: "bold",
-    
+   
 
   },
   content5: {
     paddingBottom: 10,
     fontSize:17
   },
+  
   page1: {
     paddingBottom: 5,
     fontSize: 17,
@@ -297,6 +295,7 @@ const styles = StyleSheet.create({
 
     fontSize: 17,
   },
+
   content2: {
     paddingTop: -20,
     fontSize: 17,
@@ -311,25 +310,6 @@ const styles = StyleSheet.create({
     paddingTop: height * -3,
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

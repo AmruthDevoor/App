@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
@@ -21,14 +22,14 @@ import Header from "../AppHeader";
 import axios from "axios";
 import { useRef } from "react";
 
-const MatReqAdd = () => {
+const LeaveReqAdd = () => {
   const [selected, setSelected] = React.useState("");
   const [date, setDate] = useState(new Date());
   const [fromMode, setFromMode] = useState("date");
   const [toMode, setToMode] = useState("date");
   const [fromShow, setFromShow] = useState(false);
   const [toShow, setToShow] = useState(false);
-
+  const navigation = useNavigation();
   const [isFocus, setIsFocus] = useState(false);
 
   const [accessToken, setAccessToken] = useState("");
@@ -41,6 +42,7 @@ const MatReqAdd = () => {
   const [header, setHeader] = useState("");
   const [leaveDays, setLeaveDays] = useState("");
   const [toDate, setToDate] = useState("");
+  const[show,setShow] = useState("")
   const onFromChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
 
@@ -92,7 +94,7 @@ const MatReqAdd = () => {
       setTechId(value);
     });
     getLeaveAdd();
-  }, [accessToken]);
+  }, [accessToken,techId,show]);
 
   const getLeaveAdd = () => {
     axios({
@@ -108,7 +110,17 @@ const MatReqAdd = () => {
   };
 
   const requestLeave = (e) => {
-    console.warn(fromDate);
+    if(header===""){
+      Alert.alert("Please enter the Header")}
+    else if(leaveDays===""){
+        Alert.alert("Please enter the leave days")
+      }
+      else if(leaveDays==0){
+        Alert.alert("Leave Days cannot be 0")
+      }
+      else if(description==="")
+      Alert.alert("Please enter the description")
+      else{
     e.preventDefault();
 
     let data = {
@@ -127,7 +139,7 @@ const MatReqAdd = () => {
        
         "toDate": toDate
       }
-    console.warn(data);
+  
     axios({
       method: "POST",
       url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/leave/v1/requestLeave",
@@ -136,9 +148,8 @@ const MatReqAdd = () => {
         Authorization: "Bearer " + accessToken,
       },
       data: data,
-    }).then((res) => {
-      console.warn(res);
-    });
+    }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("Leave")});
+  }
   };
   return (
     <View>
@@ -204,6 +215,7 @@ const MatReqAdd = () => {
             onChangeText={(text) => {
               setLeaveDays(text);
             }}
+            keyboardType="number"
             style={Styles.inp}
           />
           <TextInput
@@ -230,7 +242,7 @@ const MatReqAdd = () => {
   );
 };
 
-export default MatReqAdd;
+export default LeaveReqAdd;
 const { width } = Dimensions.get("window");
 const Styles = StyleSheet.create({
   submit: {

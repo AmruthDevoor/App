@@ -7,6 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Pressable,
+  SafeAreaView,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
@@ -32,7 +34,8 @@ const LeaveRequest = () => {
   const [techId, setTechId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [LeaveRequest, setLeaveRequest] = useState([]);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ const LeaveRequest = () => {
     });
 
     getLeaveRequest();
-  }, [accessToken]);
+  }, [accessToken,pageNumber,LeaveRequest]);
 
   const getLeaveRequest = () => {
     axios({
@@ -56,11 +59,56 @@ const LeaveRequest = () => {
         Authorization: "Bearer " + accessToken,
       },
     }).then((result) => {
-      console.warn(result.data);
+   
+      setTotalPages(result.data.totalPages);
 
       setLeaveRequest(result.data.content);
     });
   };
+
+  const handlePreviousPage = () => {
+    // console.warn("previous page clicked", pageNumber)
+    // Do this so your page can't go negative
+    setPageNumber(pageNumber-1)
+}
+
+const handleNextPage = () => {
+    // console.warn("next page clicked"+ " "+ (pageNumber+1))
+    setPageNumber(pageNumber + 1)
+
+    
+}
+  
+const viewItem = ({item}) => {
+  return (
+      <View >
+     <Card style={styles.card}>
+      <Card.Content >   
+     <Text style={styles.header}>{item.header==="" ? "No header":item.header}</Text>
+     </Card.Content>
+     <View style={{ flexDirection: "row" }}>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>From Date :{moment(item.fromDate).format("L")}</Text>
+     </Card.Content>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content1}>To Date : {moment(item.toDate).format("L")}</Text>
+     </Card.Content>
+     </View>
+     <Card.Content style={styles.remark}>   
+     <Text style={styles.content5}>Leave Days : {item.leaveDays}</Text>
+     </Card.Content>
+     <Card.Content style={styles.remark}>   
+     <Text style={styles.content5}>Status : {item.status==="" ? "No Status":item.status}</Text>
+     </Card.Content>
+     <Card.Content style={styles.remark}>   
+     <Text style={styles.content5}>Description : {"\n"}{item.description==="" ? "No Description":item.description}</Text>
+     </Card.Content>
+     
+     </Card>
+
+      </View>
+  )
+}
 
   return (
     <View style={styles.container}>
@@ -72,7 +120,7 @@ const LeaveRequest = () => {
             <Text style={styles.btnText}>Request</Text>
           </Pressable>
 
-          {LeaveRequest.map((LeaveReq) => {
+          {/* {LeaveRequest.map((LeaveReq) => {
             return (
               <ScrollView>
                 <Card style={styles.card}>
@@ -114,10 +162,48 @@ const LeaveRequest = () => {
                 </Card>
               </ScrollView>
             );
-          })}
+          })} */}
+           <SafeAreaView>
+          <FlatList
+              data={LeaveRequest}
+              renderItem={viewItem}
+              // ListHeaderComponent={ListHeader}
+              keyExtractor={(item, index) => index.toString()}
+              showsVerticalScrollIndicator={false}
+          />
+      </SafeAreaView> 
         </View>
       </ScrollView>
       <View style={{ zIndex: -1 }}>
+        <Card>
+        <Card.Content style={styles.page}>
+              <TouchableOpacity  onPress={() => handlePreviousPage()}>
+            
+                <Text>
+                  {" "}
+                  <MaterialIcons
+                    name="arrow-back-ios"
+                    size={20}
+                    color="#0073A9"
+                  />
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.page1}>{pageNumber} of {totalPages -1 }</Text>
+              <TouchableOpacity onPress={() => handleNextPage()}>
+                <Text>
+                  {" "}
+                  <MaterialIcons
+                    name="arrow-forward-ios"
+                    size={20}
+                    color="#0073A9"
+                  />
+                </Text>
+              </TouchableOpacity>
+            </Card.Content>
+        </Card>
+        <Card>
+          <Text></Text>
+        </Card>
         <Card>
           <Text></Text>
         </Card>

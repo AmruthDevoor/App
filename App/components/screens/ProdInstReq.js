@@ -7,20 +7,44 @@ import {
     Dimensions,
     TouchableOpacity,
     SafeAreaView,
+    Alert,
   } from "react-native";
   import React, { useEffect, useState } from "react";
   import { useNavigation } from "@react-navigation/native";
+  import DateTimePicker from "@react-native-community/datetimepicker";
   import SelectList from "react-native-dropdown-select-list";
+  import * as ImagePicker from 'expo-image-picker';
   import { MaterialIcons } from "@expo/vector-icons";
   import AsyncStorage from "@react-native-async-storage/async-storage";
-  
+  import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
   import Header from "../AppHeader";
   import axios from "axios";
   import { useRef } from "react";
+import { Button } from "react-native-paper";
+import { Image } from "react-native";
+
   
   const ProdInstReq = () => {
+    const options = {
+      title:'Select Image',
+      type:'library',
+      options:{
+        maxHeight: 200,
+        maxWidth: 200,
+        selectionLimit: 1,
+        mediaType: 'photo',
+        includeBase64: false,
+    
+      },
+    }
+    
+    const navigation = useNavigation();
+    const [date, setDate] = useState(new Date());
+    const [mode, setMode] = useState("date");
+   
+    const [showw, setShoww] = useState(false);
     const [value, setValue] = useState();
-  
+    const [image, setImage] = useState(null);
     const [selected, setSelected] = React.useState("");
     const [proSelected, setProSelected] = React.useState("");
 
@@ -34,14 +58,49 @@ import {
     const [plant, setPlant] = useState([]);
     const [product, setProduct] = useState([]);
   
-    const [totQuan, setQuantity] = useState("");
-    const [productSerialNo,setProductSerialNo] = useState("");
+    const [totQuan, setQuantity] = useState();
+    const [productSerialNo,setProductSerialNo] = useState();
    const[plantId,setPlantId]= useState("")
    const[productHandoverId,setProductHandoverId]= useState("")
-
+   const[show,setShow] = useState("")
+const[productName,setProductName]=useState("")
+const[installationDate,setInstallationDate]=useState("")
     const [remark, setRemark] = useState("");
-    const [techId, setTechId] = useState("");
+    const [techId, setTechId] = useState();
+    const onFromChange = (event, selectedDate) => {
+      const currentDate = selectedDate || date;
+    
+      setShoww(Platform.OS === "android");
+      setShoww(false);
+      setDate(currentDate);
+      let tempDate = new Date(currentDate);
+      let fDate =
+        tempDate.getFullYear() +
+        "-" +
+        (tempDate.getMonth() + 1) +
+        "-" +
+        tempDate.getDate();
+      setInstallationDate(fDate);
+    };
+    const showMode = (currentMode) => {
+      setShoww(true);
+      setMode(currentMode);
+    };
+    const pickImage = async () => {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
   
+     // console.log(result);
+  
+      if (!result.cancelled) {
+        setImage(result.uri);
+      }
+    };
     
     useEffect(() => {
       AsyncStorage.getItem("AccessToken").then((value) => {
@@ -54,16 +113,16 @@ import {
       getAllPlants();
       getAssignedProduct();
 
-    }, [accessToken]);
+    }, [accessToken,techId,show]);
   
     const AllPlants = plant.map((p) => {
       return { key: p.plantId, value: p.plantName };
     });
     const AssignedProduct = product.map((ap) => {
-      return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo };
+      return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo, };
       
     });
-    console.warn(AssignedProduct)
+   
     const getAllPlants = () => {
       axios({
         method: "GET",
@@ -86,12 +145,13 @@ import {
         },
       }).then((result) => {
       setProductSerialNo(result.data.productSerialNo);
+      setProductName(result.data.productName)
       });
     };
     const getAssignedProduct = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productassign/v1/getAllAssignedProducts/{technicianId}?technicianId=3`,
+        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productassign/v1/getAllAssignedProducts/{technicianId}?technicianId=${techId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -102,7 +162,7 @@ import {
         
       });
     };
-    console.warn(product)
+  
   
     const renderLabel = () => {
       if (value || isFocus) {
@@ -116,7 +176,15 @@ import {
     };
   
     const requestProduct = (e) => {
-  
+ 
+   if(totQuan===""){
+  Alert.alert("Please enter the quantity")}
+else if(totQuan==0){
+    Alert.alert("Quantity cannot be 0")
+  }
+  else if(remark==="")
+  Alert.alert("Please enter the remark")
+  else{
       e.preventDefault();
      
   
@@ -127,9 +195,11 @@ import {
         "productHandoverDto": {
           "productHandoverId": proSelected
         },
+        "productName":productName,
         "productSerialNo": productSerialNo,
         "quantity": totQuan,
         "remark": remark,
+        "installationDate":installationDate,
         "technicianDto": {
           "technicianId": techId
         }
@@ -143,8 +213,8 @@ import {
               Authorization: "Bearer " + accessToken,
             },
             data:data,
-      }).then((res)=>{console.warn(res)});
-      
+      }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("ProductInstallation")});
+    }
     };
     return (
       <View>
@@ -161,6 +231,25 @@ import {
            
             placeholder="Select A Product"
           />
+          <TextInput
+            placeholder="Product Name"
+          
+            value={productName}
+            
+            onChangeText={(prodName) => {
+              setProductName(prodName);
+            }}
+            style={Styles.inp}
+          />
+  <TextInput
+            placeholder="serial no"
+            value={productSerialNo}
+            keyboardType="numeric"
+            
+            style={Styles.inp2}
+          />
+  
+ 
            
           
           <TextInput
@@ -171,15 +260,10 @@ import {
             onChangeText={(text) => {
               setQuantity(text);
             }}
-            style={Styles.inp}
+            style={Styles.quan}
           />
-          <TextInput
-            placeholder="serial no"
-            value={productSerialNo}
-            keyboardType="numeric"
-            
-            style={Styles.inp2}
-          />
+          
+     
          <SelectList
         
             setSelected={setSelected}
@@ -187,7 +271,26 @@ import {
             onSelect={() => alert(selected)}
             placeholder="Select A Plant"
           />
-          
+          <View>
+            <Text style={{ fontSize: 15 ,paddingTop:10}}>Installation Date: {installationDate}</Text>
+            <View>
+              <TouchableOpacity>
+              <Text style={{backgroundColor:"#0073A9",color:"white",width:350,height:30,textAlign:"center",paddingTop:7 }}  onPress={() => showMode("date")} >
+              Installation Date
+              </Text>
+              </TouchableOpacity>
+            </View>
+            {showw && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                display="default"
+                onChange={onFromChange}
+              />
+            )}
+          </View>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -196,6 +299,8 @@ import {
             }}
             style={Styles.inp1}
           />
+          
+
           </SafeAreaView>
           <TouchableOpacity>
             <Pressable onPress={(e)=>{requestProduct(e)}}  style={Styles.submit}>
@@ -234,6 +339,14 @@ import {
       borderWidth: 0.19,
       borderRadius: 3,
       marginTop: 20,
+      paddingLeft: 10,
+    },
+    quan: {
+      height: 50,
+      borderWidth: 0.19,
+      borderRadius: 3,
+      marginTop: 20,
+      marginBottom:20,
       paddingLeft: 10,
     },
     inp2: {

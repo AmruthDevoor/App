@@ -17,12 +17,18 @@ import {
 } from "react-native-responsive-dimensions";
 import { Card, Paragraph } from "react-native-paper";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const Collection = () => {
   const [techId, setTechId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [task, setTask] = useState([]);
-
+  const navigation = useNavigation();
+  const onForm = (Cid) => {
+   
+    AsyncStorage.setItem ("collectiontaskId",JSON.stringify(Cid));
+    navigation.navigate("collectionForm");
+  };
   
   useEffect(() => {
     AsyncStorage.getItem("id").then((value) => {
@@ -59,6 +65,9 @@ const Collection = () => {
         <View>
           {task.map((tsk) => {
             return (
+              <TouchableOpacity onPress={(e)=>{
+                onForm(tsk.collectiontaskId)
+                            }}>
               <Card style={styles.card}>
                 <View style={{flexDirection:"row" ,backgroundColor:"skyblue"}}>
                 <Text style={styles.title}>{tsk.collectiontaskName}</Text>
@@ -95,6 +104,7 @@ const Collection = () => {
                   </View>
                 </Card.Content>
               </Card>
+              </TouchableOpacity>
             );
           })}
 

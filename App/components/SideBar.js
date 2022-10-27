@@ -11,10 +11,10 @@ const SideBar = () => {
     navigation.navigate("HomeScreen");
   };
   const onCollection = () => {
-    navigation.navigate("Collection");
+    navigation.navigate("collectionSide");
   };
   const onTasks = () => {
-    navigation.navigate("Tasks");
+    navigation.navigate("taskPage");
   };
   const onStock = () => {
     navigation.navigate("Stock");
@@ -38,7 +38,7 @@ const SideBar = () => {
     navigation.navigate("Login");
   };
   const onPlantHealth = () => {
-    navigation.navigate("PlantTask");
+    navigation.navigate("PlantHealthSide");
   };
  
   return (

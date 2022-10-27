@@ -17,12 +17,21 @@ import {
 } from "react-native-responsive-dimensions";
 import { Card, Paragraph } from "react-native-paper";
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native'
 
 const Tasks = () => {
+
   const[techId,setTechId]=useState("")
+  const[taskId,setTaskId]=useState("")
+
   const[accessToken,setAccessToken]=useState("")
   const[task,setTask]=useState([]);
-
+const navigation = useNavigation();
+  const onForm = (id) => {
+   
+    AsyncStorage.setItem ("taskId",JSON.stringify(id));
+    navigation.navigate("taskForm");
+  };
   useEffect(() => {
     
     AsyncStorage.getItem("id").then((value) => {
@@ -47,7 +56,7 @@ const Tasks = () => {
     }).then((result) => {
 
       setTask(result.data);
-
+      
     });
   };
   const showAlert = (text) =>{
@@ -57,10 +66,13 @@ const Tasks = () => {
     <View>
     <Header />
     <ScrollView style={styles.main1}>
-      <Text style={styles.head}>Collection</Text>
+      <Text style={styles.head}>Task</Text>
       <View>
         {task.map((tsk) => {
           return (
+            <TouchableOpacity onPress={(e)=>{
+onForm(tsk.taskId)
+            }}>
             <Card style={styles.card}>
               <View style={{flexDirection:"row" ,backgroundColor:"skyblue"}}>
               <Text style={styles.title}>{tsk.taskName}</Text>
@@ -97,6 +109,7 @@ const Tasks = () => {
                 </View>
               </Card.Content>
             </Card>
+            </TouchableOpacity>
           );
         })}
 

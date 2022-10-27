@@ -7,9 +7,7 @@ import {
     Dimensions,
     TouchableOpacity,
     SafeAreaView,
-    Alert,
   } from "react-native";
-  import { useValidation } from 'react-native-form-validator';
   import React, { useEffect, useState } from "react";
   import { useNavigation } from "@react-navigation/native";
   import SelectList from "react-native-dropdown-select-list";
@@ -37,10 +35,6 @@ import { Navigation } from "react-native-navigation";
     const [remark, setRemark] = useState("");
     const [techId, setTechId] = useState("");
    const[show,setShow] = useState("")
-   const { validate, isFieldInError, getErrorsInField, getErrorMessages } =
-    useValidation({
-      state: { totQuan,remark },
-    });
     
     useEffect(() => {
       AsyncStorage.getItem("AccessToken").then((value) => {
@@ -82,18 +76,7 @@ import { Navigation } from "react-native-navigation";
     };
   
     const requestProduct = (e) => {
-  if(totQuan==="" ){
-    Alert.alert("Please enter the quantity")
-
-  }else if(totQuan==0){
-    Alert.alert("Quantity cannot be 0")
-  }
   
-  else if(remark==="")
-  {
-    Alert.alert("Please enter the remark")
-  }
-  else{
       e.preventDefault();
     //  console.warn(totQuan);
   
@@ -118,7 +101,7 @@ import { Navigation } from "react-native-navigation";
             data:data,
 
       }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("ProdReq")});
-    }
+      
       
     };
     return (
@@ -144,7 +127,6 @@ import { Navigation } from "react-native-navigation";
               setQuantity(text);
             }}
             style={Styles.inp}
-          
           />
           
           <TextInput

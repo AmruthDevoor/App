@@ -41,6 +41,15 @@ import ProductUninstall from "../components/screens/ProductUninstall";
 import ProdUninstReq from "../components/screens/ProdUninstReq";
 import MaterialUninstall from "../components/screens/MaterialUninstall";
 import MatUninstReq from "../components/screens/MatUninstReq";
+import TaskPage from "../components/screens/TaskPage";
+import TaskForm from "../components/screens/TaskForm";
+import TaskSideClick from "../components/screens/TaskSideClick";
+import PlantHealthForm from "../components/screens/PlantHealthForm";
+import PlantHealthSide from "../components/screens/PlantHealthSide";
+import PlantHealthClick from "../components/screens/PlanthHealthClick";
+import CollectionForm from "../components/screens/CollectionForm";
+import CollectionSide from "../components/screens/CollectionSide";
+import CollectionClick from "../components/screens/CollectionClick";
 const sampleTabNavigation = createNativeStackNavigator();
 
 const AuthNavigator = () => {
@@ -109,6 +118,7 @@ const AuthNavigator = () => {
         component={NewPasswordScreen}
       />
       <sampleTabNavigation.Screen name="MatReqAdd" component={MatReqAdd} />
+
       <sampleTabNavigation.Screen name="ProdReqAdd" component={ProductReqAdd} />
       <sampleTabNavigation.Screen name="ProdReq" component={ProductReq} />
       <sampleTabNavigation.Screen
@@ -142,6 +152,15 @@ const AuthNavigator = () => {
         name="MatUninstReq"
         component={MatUninstReq}
       />
+      <sampleTabNavigation.Screen name="taskPage" component={TaskPage} />
+      <sampleTabNavigation.Screen name="PlantHealthForm" component={PlantHealthForm} />
+      <sampleTabNavigation.Screen name="taskForm" component={TaskForm} />
+      <sampleTabNavigation.Screen name="taskSide" component={TaskSideClick} />
+      <sampleTabNavigation.Screen name="PlantHealthSide" component={PlantHealthSide} />
+      <sampleTabNavigation.Screen name="PlantHealthClick" component={PlantHealthClick} />
+      <sampleTabNavigation.Screen name="collectionForm" component={CollectionForm} />
+      <sampleTabNavigation.Screen name="collectionSide" component={CollectionSide} />
+      <sampleTabNavigation.Screen name="collectionClick" component={CollectionClick} />
     </sampleTabNavigation.Navigator>
   );
 };

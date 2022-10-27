@@ -1,23 +1,28 @@
-
-
-
-
 import {
   View,
   StyleSheet,
   Text,
   Button,
   ScrollView,
-  RefreshControl,
   Dimensions,
   TouchableOpacity,
   Pressable,
   SafeAreaView,
   FlatList,
+  Image,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-
+import {
+  responsiveScreenHeight,
+  useResponsiveHeight,
+  useResponsiveWidth,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveHeight,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import Header from "../AppHeader";
 
 import Footer from "./Footer";
@@ -30,25 +35,22 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
-const wait = (timeout) => {
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
-const MaterialRequest = () => {
-  const navigation = useNavigation();
-  const onReq = () => {
-    navigation.navigate("MatReqAdd");
-  };
+
+const TaskPage = () => {
+  
   const [techId, setTechId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPages, setTotalPages] = useState(10);
   const [pageSize, setPageSize] = useState(5);
-  const [MaterialRequest, setMaterialRequest] = useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    wait(1000).then(() => setRefreshing(false));
-  }, []);
+  const [TaskPage, setTaskPage] = useState([]);
+  const navigation = useNavigation();
+  const onTaskSide = (id) => {
+    console.warn(id)
+    navigation.navigate("taskSide");
+    AsyncStorage.setItem ("serviceId",JSON.stringify(id));
+  };
+  
   useEffect(() => {
     AsyncStorage.getItem("id").then((value) => {
       setTechId(value);
@@ -58,77 +60,94 @@ const MaterialRequest = () => {
       setAccessToken(JSON.parse(value));
     });
 
-    getMaterialRequest();
-  }, [accessToken,pageNumber,MaterialRequest]);
 
-  const getMaterialRequest = () => {
+    getTaskPage();
+  }, [accessToken,pageNumber]);
+
+  const getTaskPage = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialrequest/v1/getRequestedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getAllTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
       },
     }).then((result) => {
-
+      console.warn(result.data);
       setTotalPages(result.data.totalPages);
 
-      setMaterialRequest(result.data.content);
+      setTaskPage(result.data.content);
     });
   };
 
   const handlePreviousPage = () => {
-   // console.warn("previous page clicked", pageNumber)
+    console.warn("previous page clicked", pageNumber)
     // Do this so your page can't go negative
     setPageNumber(pageNumber-1)
 }
 
 const handleNextPage = () => {
-    //console.warn("next page clicked"+ " "+ (pageNumber+1))
+    console.warn("next page clicked"+ " "+ (pageNumber+1))
     setPageNumber(pageNumber + 1)
 
     
 }
-  
+const showAlert = (text) =>{
+  Alert.alert(text)
+}
 const viewItem = ({item}) => {
-  return (
-      <View >
-     <Card style={styles.card}>
-      <Card.Content >   
-     <Text style={styles.header}>{item.materialDto===null ? "No material name":item.materialDto.materialName}</Text>
-     </Card.Content>
-    
-     <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>Quantity : {item.quantity}</Text>
-     </Card.Content>
-     <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>Remark :{"\n"} {item.remark}</Text>
-     </Card.Content>
-   
-     
-     </Card>
 
+  return (
+    <Card style={styles.ccard} onPress={()=>{
+      onTaskSide(item.taskId)
+    }}>
+    <View style={{flexDirection:"row" ,backgroundColor:"skyblue"}}>
+    <Text style={styles.ttitle}>{item.taskName}</Text>
+ <TouchableOpacity onPress = {()=>{showAlert(item.description)}}> 
+  <Text  style={styles.ttitle}> <MaterialIcons
+          name="error"
+          size={20}
+          color="#0073A9"
+        /></Text>
+         </TouchableOpacity>
+        </View>
+    <View
+      style={{
+        borderBottomColor: "black",
+        borderBottomWidth: StyleSheet.hairlineWidth,
+      }}
+    />
+    {/* <Card.Content style={styles.content0}>
+      <Paragraph style={styles.paragraph}>
+        {item.description}
+      </Paragraph>
+    </Card.Content> */}
+    <Card.Content style={{paddingTop:20}} >
+      <Text>Ticket .No: {item.taskTicketNumber}</Text>
+     </Card.Content>
+     <Card.Content style={{flexDirection:"row",paddingTop:10}} > 
+      <View >
+      <Text >
+        Assigned Date: {moment(item.assigningDate).format("L")}
+      </Text  >
       </View>
+      <View >
+      <Text style={{paddingLeft:30}}>DeadLine: {moment(item.deadlineDate).format("L")}</Text>
+      </View>
+    </Card.Content>
+  </Card>
   )
 }
 
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView style={styles.main1} 
-       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      }>
+      <ScrollView style={styles.main1}>
         <View style={{ zIndex: -1 }}>
-          <Text style={styles.head}>Requested Material</Text>
-          <Pressable onPress={onReq} style={styles.submit}>
-            <Text style={styles.btnText}>Request</Text>
-          </Pressable>
+          <Text style={styles.head}>Completed Service Tasks</Text>
+        
 
-          {/* {MaterialRequest.map((LeaveReq) => {
+          {/* {TaskPage.map((LeaveReq) => {
             return (
               <ScrollView>
                 <Card style={styles.card}>
@@ -173,7 +192,7 @@ const viewItem = ({item}) => {
           })} */}
            <SafeAreaView>
           <FlatList
-              data={MaterialRequest}
+              data={TaskPage}
               renderItem={viewItem}
               // ListHeaderComponent={ListHeader}
               keyExtractor={(item, index) => index.toString()}
@@ -229,7 +248,7 @@ const viewItem = ({item}) => {
   );
 };
 
-export default MaterialRequest;
+export default TaskPage;
 
 const styles = StyleSheet.create({
   main1: {
@@ -245,6 +264,20 @@ const styles = StyleSheet.create({
     marginLeft: 280,
     justifyContent: "center",
     alignItems: "center",
+  },
+  ccard: {
+    // height: responsiveScreenHeight(20),
+    marginTop: responsiveHeight(0) + 20,
+    marginLeft: responsiveWidth(0)+8,
+    zIndex: -1,
+    backgroundColor:"white",
+    width: responsiveScreenWidth(95)
+  },
+  ttitle:{
+    backgroundColor:"skyblue",
+    fontSize:23,
+    paddingBottom:13,
+    paddingTop:10,
   },
   btnText: {
     fontSize: 16,
@@ -281,13 +314,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     fontSize: 20,
     fontWeight: "bold",
-    
+   
 
   },
   content5: {
     paddingBottom: 10,
     fontSize:17
   },
+  
   page1: {
     paddingBottom: 5,
     fontSize: 17,
@@ -297,6 +331,7 @@ const styles = StyleSheet.create({
 
     fontSize: 17,
   },
+
   content2: {
     paddingTop: -20,
     fontSize: 17,
@@ -311,25 +346,6 @@ const styles = StyleSheet.create({
     paddingTop: height * -3,
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -8,27 +8,35 @@ import {
     TouchableOpacity,
     SafeAreaView,
     Alert,
+    ScrollView,
   } from "react-native";
   import React, { useEffect, useState } from "react";
-  import DateTimePicker from "@react-native-community/datetimepicker";
   import { useNavigation } from "@react-navigation/native";
+  import DateTimePicker from "@react-native-community/datetimepicker";
   import SelectList from "react-native-dropdown-select-list";
+  import * as ImagePicker from 'expo-image-picker';
   import { MaterialIcons } from "@expo/vector-icons";
   import AsyncStorage from "@react-native-async-storage/async-storage";
-  
+  import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
   import Header from "../AppHeader";
   import axios from "axios";
   import { useRef } from "react";
+  import { Button } from "react-native-paper";
+  import { Image } from "react-native";
   
-  const ProdUninstReq = () => {
-    const [value, setValue] = useState();
+  
+  const MatInstReq = () => {
+  
+    const navigation = useNavigation();
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState("date");
    
     const [showw, setShoww] = useState(false);
+    const [value, setValue] = useState();
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
     const [selected, setSelected] = React.useState("");
-    const [proSelected, setProSelected] = React.useState();
-
+    const [proSelected, setProSelected] = React.useState("");
+  
     const [productSelected, setProductSelected] = React.useState("");
   
   
@@ -37,16 +45,18 @@ import {
     const [accessToken, setAccessToken] = useState("");
   
     const [plant, setPlant] = useState([]);
-    const [product, setProduct] = useState([]);
-    const [productName, setProductName] = useState("");
-    const [totQuan, setQuantity] = useState();
-    const [productSerialNo,setProductSerialNo] = useState("");
-   const[plantId,setPlantId]= useState("")
-
-   const[uninstallationDate,setUninstallationDate]= useState("")
-    const [remark, setRemark] = useState("");
-    const [techId, setTechId] = useState("");
+    const [material, setMaterial] = useState([]);
+  const[materialId,setMaterialId]=useState()
   
+    const [totQuan, setQuantity] = useState();
+    const [productSerialNo,setProductSerialNo] = useState();
+   const[plantId,setPlantId]= useState("")
+   const[productHandoverId,setProductHandoverId]= useState("")
+   const[show,setShow] = useState("")
+  const[materialName,setMaterialName]=useState("")
+  const[installationDate,setInstallationDate]=useState("")
+    const [remark, setRemark] = useState("");
+    const [techId, setTechId] = useState();
     const onFromChange = (event, selectedDate) => {
       const currentDate = selectedDate || date;
     
@@ -60,29 +70,77 @@ import {
         (tempDate.getMonth() + 1) +
         "-" +
         tempDate.getDate();
-      setUninstallationDate(fDate);
+      setInstallationDate(fDate);
     };
     const showMode = (currentMode) => {
       setShoww(true);
       setMode(currentMode);
     };
+    const pickImage = async () => {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+       
+      });
+      var filename = result.uri.substring(result.uri.lastIndexOf('/') + 1, result.uri.length);
+     console.warn(filename);
+     console.warn(result);
+  
+      if (!result.cancelled) {
+        setSelectedPhoto(result.uri);
+      }
+    };
+    const uploadImage = (e) => {
+      e.preventDefault();
+      console.warn("a image")
+      console.warn(selectedPhoto)
+      const data = new FormData();
+  
+      data.append("file", selectedPhoto);
+  
+      axios({
+        mode: "no-cors",
+        method: "post",
+        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile`,
+        headers: {
+          "content-type": "multipart/form-data",
+          Authorization: "Bearer " + accessToken,
+        },
+        data,
+      })
+        .then(function (res) {
+          console.warn(res)
+          setPhotoName(res.data.fileName);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    };
+    
     useEffect(() => {
       AsyncStorage.getItem("AccessToken").then((value) => {
         setAccessToken(JSON.parse(value));
       });
       AsyncStorage.getItem("id").then((value) => {
-
+  
         setTechId(value);
       });
       getAllPlants();
-      getInstalledProduct();
-
-    }, [accessToken]);
+      getAllMaterials();
+  
+  
+    }, [accessToken,techId,show]);
   
     const AllPlants = plant.map((p) => {
       return { key: p.plantId, value: p.plantName };
     });
-
+    const AssignedMaterial = material.map((ap) => {
+      return { key: ap.materialId, value: (ap.materialName===null)? "no name":ap.materialName  };
+      
+    });
     const getAllPlants = () => {
       axios({
         method: "GET",
@@ -93,25 +151,37 @@ import {
         },
       }).then((result) => {
         setPlant(result.data);
+        setPlantId(result.data)
       });
     };
    
-    const getInstalledProduct = () => {
+    const getAllMaterials = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productlog/v1/getInstalledProductByPlantId/{plantId}?plantId=${proSelected}`,
+        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/material/v1/getAllMaterials`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
         },
       }).then((result) => {
-        
-       console.warn(plantId)
-        setProductSerialNo(result.data.productSerialNo);
-      setProductName(result.data.productName)
+        setMaterial(result.data);
+      
       });
     };
-    
+    const getByProductHandoverId = () => {
+      axios({
+        method: "GET",
+        url: ` https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/material/v1/getMaterialByMaterialId/{materialId}?materialId=${proSelected}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((result) => {
+        setMaterialName(result.data.materialName)
+      
+      });
+    };
+  
   
     const renderLabel = () => {
       if (value || isFocus) {
@@ -125,88 +195,71 @@ import {
     };
   
     const requestProduct = (e) => {
-  if(productName===""){
-    Alert.alert("please enter the product name")
+  
+   if(totQuan===""){
+  Alert.alert("Please enter the quantity")}
+  else if(totQuan==0){
+    Alert.alert("Quantity cannot be 0")
   }
-  else if(productSerialNo===""){
-    Alert.alert("please enter serial number")
-  }
-  else if(totQuan===""){
-    Alert.alert("please enter the quantity")
-  }
-  else if(remark===""){
-    Alert.alert("please enter the remark")
-  }else{
+  else if(remark==="")
+  Alert.alert("Please enter the remark")
+  else{
       e.preventDefault();
      
   
       let data ={
-       
-        "plantDto": {
-          "plantId": proSelected
+        "installationDate": installationDate,
+        "materialDto": {
+          "materialId": proSelected
         },
-        "productName": productName,
-        "productSerialNo": productSerialNo,
+        
+        
+        "plantDto": {
+          "plantId": selected
+        },
         "quantity": totQuan,
         "remark": remark,
         "technicianDto": {
           "technicianId": techId
-        },
-        "uninstallationDate": uninstallationDate
-      }
+        }
+      } 
       
       axios({
           method:"POST",
-          url:"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productlog/v1/uninstallProduct",
+          url:"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materiallog/v1/installMaterial",
           headers: {
               "Content-Type": "application/json",
               Authorization: "Bearer " + accessToken,
             },
             data:data,
-      }).then((res)=>{console.warn(res)});
-      
-    };}
+      }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("MaterialInstallation")});
+    }
+    };
     return (
-      <View>
+      <ScrollView>
         <Header />
-        <Text style={{fontSize:35 , marginBottom:20,zIndex:-1}} >Uninstall a Product</Text>
+        <Text style={{fontSize:35 , marginBottom:20,zIndex:-1}} >Install a Material</Text>
+        
         <View style={Styles.container}>
+          
           {renderLabel()}
   
   <SafeAreaView>
-  {/* <SelectList
+  <SelectList
             setSelected={setProSelected}
-            data={AssignedProduct}
-            onSelect={() =>getByProductHandoverId(proSelected)}
+            data={AssignedMaterial}
+            onSelect={() =>alert(proSelected)}
            
-            placeholder="Select A Product"
-          /> */}
-           
-           <SelectList
-        
-            setSelected={setProSelected}
-            data={AllPlants}
-            onSelect={() =>getInstalledProduct(proSelected)}
-            placeholder="Select A Plant"
-          />
-          
-          <TextInput
-            placeholder="Product Name"
-          
-            value={productName}
-           
-            onChangeText={(prodName) => {
-              setProductName(prodName);
-            }}
-            style={Styles.inp}
-          />
-           <TextInput
-            placeholder="serial no"
-            value={productSerialNo}
-            keyboardType="numeric"
+            placeholder="Select A Material"
             
-            style={Styles.inp2}
           />
+       
+         
+   
+  
+  
+           
+          
           <TextInput
             placeholder="Quantity"
           
@@ -215,18 +268,29 @@ import {
             onChangeText={(text) => {
               setQuantity(text);
             }}
-            style={Styles.inp}
+            style={Styles.quan}
           />
-        <View>
-            <Text style={{ fontSize: 15 ,paddingTop:10}}>Uninstallation Date: {uninstallationDate}</Text>
+          
+     
+        
+          <View>
+            <Text style={{ fontSize: 15 ,paddingTop:10,}}>Installation Date: {installationDate}</Text>
             <View>
               <TouchableOpacity>
-              <Text style={{backgroundColor:"#0073A9",color:"white",width:350,height:30,textAlign:"center",paddingTop:7 }}  onPress={() => showMode("date")} >
-              Uninstallation Date
+              <Text style={{backgroundColor:"#0073A9",color:"white",width:350,height:30,textAlign:"center",paddingTop:7,marginBottom:20 }}  onPress={() => showMode("date")} >
+              Installation Date
               </Text>
+              <SelectList
+          
+          setSelected={setSelected}
+          data={AllPlants}
+          onSelect={() => alert(selected)}
+          placeholder="Select A Plant"
+          style={{marginTop:10}}
+        />
               </TouchableOpacity>
             </View>
-             {showw && (
+            {showw && (
               <DateTimePicker
                 testID="dateTimePicker"
                 value={date}
@@ -237,8 +301,18 @@ import {
               />
             )}
           </View>
-       
+          <Text  style={{borderWidth:0.5,marginTop:15,height:30}} ></Text>
+          <View style={{flexDirection:"row"}}>
+        <Button title="Pick an image from camera roll" onPress={pickImage} style={Styles.submit1} >
+          <Text style={Styles.btnText}>Select image</Text>
           
+        </Button>
+        <Button title="Pick an image from camera roll" onPress={uploadImage} style={Styles.submit1} >
+          <Text style={Styles.btnText}>Upload image</Text>
+        </Button>
+        
+      </View>
+      {selectedPhoto && <Image source={{ uri: selectedPhoto }} style={{ width: 200, height: 200 }} />}
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -247,6 +321,9 @@ import {
             }}
             style={Styles.inp1}
           />
+          
+          
+  
           </SafeAreaView>
           <TouchableOpacity>
             <Pressable onPress={(e)=>{requestProduct(e)}}  style={Styles.submit}>
@@ -254,16 +331,27 @@ import {
             </Pressable>
           </TouchableOpacity>
         </View>
-      </View>
+        
+      </ScrollView>
     );
   };
   
-  export default ProdUninstReq;
+  export default MatInstReq;
   const { width } = Dimensions.get("window");
   const Styles = StyleSheet.create({
     submit: {
       height: 50,
       width: width - 40,
+      backgroundColor: "#0073A9",
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      
+      marginTop: 10,
+    },
+    submit1: {
+      height: 50,
+      width: width-215,
       backgroundColor: "#0073A9",
       borderRadius: 8,
       justifyContent: "center",
@@ -285,6 +373,14 @@ import {
       borderWidth: 0.19,
       borderRadius: 3,
       marginTop: 20,
+      paddingLeft: 10,
+    },
+    quan: {
+      height: 50,
+      borderWidth: 0.19,
+      borderRadius: 3,
+      marginTop: 20,
+      marginBottom:20,
       paddingLeft: 10,
     },
     inp2: {

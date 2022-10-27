@@ -1,199 +1,327 @@
 import {
-    View,
-    StyleSheet,
-    Text,
-    Button,
-    ScrollView,
-    Dimensions,
-    TouchableOpacity,
-  } from "react-native";
-  import React, { useEffect, useState } from "react";
-  import moment from "moment";
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+  Pressable,
+  SafeAreaView,
+  FlatList,
+  Image,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import moment from "moment";
+
+import Header from "../AppHeader";
+
+import Footer from "./Footer";
+import { Card } from "react-native-paper";
+
+import axios from "axios";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+// import MyTabs from "./BottomTab";
+const { width, height } = Dimensions.get("window");
+
+const MaterialReturn = () => {
   
-  import Header from "../AppHeader";
+  const [techId, setTechId] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPages, setTotalPages] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
+  const [MaterialReturn, setMaterialReturn] = useState([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem("id").then((value) => {
+      setTechId(value);
+    });
+
+    AsyncStorage.getItem("AccessToken").then((value) => {
+      setAccessToken(JSON.parse(value));
+    });
+
+    getMaterialReturn();
+  }, [accessToken,pageNumber]);
+
+  const getMaterialReturn = () => {
+    axios({
+      method: "GET",
+      url:  `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialreturn/v1/getReturnedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((result) => {
+     // console.warn(result.data);
+      setTotalPages(result.data.totalPages);
+
+      setMaterialReturn(result.data.content);
+    });
+  };
+
+  const handlePreviousPage = () => {
+  //  console.warn("previous page clicked", pageNumber)
+    // Do this so your page can't go negative
+    setPageNumber(pageNumber-1)
+}
+
+const handleNextPage = () => {
+    //console.warn("next page clicked"+ " "+ (pageNumber+1))
+    setPageNumber(pageNumber + 1)
+
+    
+}
   
-  import Footer from "./Footer";
-  import { Card } from "react-native-paper";
+const viewItem = ({item}) => {
+  return (
+      <View >
+     <Card style={styles.card}>
+      <View style={{flexDirection:"row"}} >
+      <Card.Content   >   
+     <Text style={styles.header}>
+      {item.materialDto.materialName==="" ? "No header":item.materialDto.materialName}
+       <MaterialIcons name="info" size={20} color="#0073A9"  />
+     </Text>
   
-  import axios from "axios";
-  
-  import AsyncStorage from "@react-native-async-storage/async-storage";
-  import { MaterialIcons } from "@expo/vector-icons";
-  // import MyTabs from "./BottomTab";
-  const { width, height } = Dimensions.get("window");
-  
-  const MaterialReturn = () => {
-    const [techId, setTechId] = useState("");
-    const [accessToken, setAccessToken] = useState("");
-    const [pageNumber, setPageNumber] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-    const [MaterialReturn, setMaterialReturn] = useState([]);
-  
-    useEffect(() => {
-      AsyncStorage.getItem("id").then((value) => {
+                     
+                  
+     </Card.Content>
+    
+     </View>
+    
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>quantity {item.receivedQuantity}</Text>
+     </Card.Content>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>Received by : {item.receivedBy}</Text>
+     </Card.Content>
+     <Card.Content style={{ flexDirection: "row" }}>   
+     <Text style={styles.content}>Date : {moment ( item.insertedDate).format("L")}</Text>
+     </Card.Content>
      
-        setTechId(value);
-      });
-  
-      AsyncStorage.getItem("AccessToken").then((value) => {
-  
-        setAccessToken(JSON.parse(value));
-      });
-  
-      getMaterialReturn();
-    }, [accessToken]);
-  
-    const getMaterialReturn = () => {
-      axios({
-        method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialreturn/v1/getReturnedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + accessToken,
-        },
-      }).then((result) => {
-      
-        setMaterialReturn(result.data.content);
-      });
-    };
-  
-    return (
-      <View style={styles.container}>
-        <Header />
-        <ScrollView style={styles.main1}>
-          <View style={{ zIndex: -1 }}>
-            <Text style={styles.head}>Returned Material</Text>
-  
-            {MaterialReturn.map((matRet) => {
-              return (
+     
+    
+
+     
+     </Card>
+
+      </View>
+  )
+}
+
+  return (
+    <View style={styles.container}>
+      <Header />
+      <ScrollView style={styles.main1}>
+        <View style={{ zIndex: -1 }}>
+          <Text style={styles.head}>Returned Material</Text>
+        
+
+          {/* {MaterialReturn.map((LeaveReq) => {
+            return (
+              <ScrollView>
                 <Card style={styles.card}>
+                <Card.Content >
+                    <Text style={styles.header}>
+                        {LeaveReq.header}
+                    </Text>
+                    
+                  </Card.Content>
+                  <View style={{ flexDirection: "row" }}>                
+                      <Card.Content style={{ flexDirection: "row" }}>
+                    <Text style={styles.content}>
+                      From Date {moment(LeaveReq.fromDate).format("L")}
+                    </Text>
+               
+                  </Card.Content>
+               
                   <Card.Content style={{ flexDirection: "row" }}>
-                    <Text style={styles.content5}>
-                      {matRet.materialDto.materialName}{" "}
-                    </Text>
-                    <TouchableOpacity>
-                      <Text style={styles.content2}>
-                        {" "}
-                        <MaterialIcons name="info" size={20} color="#0073A9" />
-                      </Text>
-                    </TouchableOpacity>
-                  </Card.Content>
-                  <Card.Content >
-                   
                     <Text style={styles.content1}>
-                      Quantity: {matRet.receivedQuantity}
+                      To Date: {moment(LeaveReq.toDate).format("L")}
                     </Text>
                   </Card.Content>
-                  <Card.Content>
-                    <Text style={styles.content}>
-                      Received by: {matRet.receivedBy}
+                  </View>
+                  <Card.Content style={styles.remark}>
+                    <Text style={styles.content5}>
+                      Leave Days: {LeaveReq.leaveDays}
                     </Text>
-                    <Text style={styles.content}>
-                      Date: {moment(matRet.insertedDate).format("L")}
+                  </Card.Content>
+                  <Card.Content style={styles.remark}>
+                    <Text style={styles.content5}>
+                      Status: {LeaveReq.status}
+                    </Text>
+                  </Card.Content>
+                  <Card.Content style={styles.remark}>
+                    <Text style={styles.content5}>
+                      Description:{"\n"}{LeaveReq.description}
                     </Text>
                   </Card.Content>
                 </Card>
-              );
-            })}
-            <Card>
-              <Card.Content style={styles.page}>
-                <TouchableOpacity>
-                  <Text>
-                    {" "}
-                    <MaterialIcons
-                      name="arrow-back-ios"
-                      size={20}
-                      color="#0073A9"
-                    />
-                  </Text>
-                </TouchableOpacity>
-                <Text style={styles.page1}>{pageNumber} of 10</Text>
-                <TouchableOpacity>
-                  <Text>
-                    {" "}
-                    <MaterialIcons
-                      name="arrow-forward-ios"
-                      size={20}
-                      color="#0073A9"
-                    />
-                  </Text>
-                </TouchableOpacity>
-              </Card.Content>
-            </Card>
-            <Card>
-              <Text></Text>
-              <Text></Text>
-           
-            </Card>
-          </View>
-        </ScrollView>
-  
-        <View style={styles.footer}>
-          <Footer />
+              </ScrollView>
+            );
+          })} */}
+           <SafeAreaView>
+          <FlatList
+              data={MaterialReturn}
+              renderItem={viewItem}
+              // ListHeaderComponent={ListHeader}
+              keyExtractor={(item, index) => index.toString()}
+              showsVerticalScrollIndicator={false}
+          />
+      </SafeAreaView> 
         </View>
+      </ScrollView>
+      <View style={{ zIndex: -1 }}>
+        <Card>
+        <Card.Content style={styles.page}>
+              <TouchableOpacity  onPress={() => handlePreviousPage()}>
+            
+                <Text>
+                  {" "}
+                  <MaterialIcons
+                    name="arrow-back-ios"
+                    size={20}
+                    color="#0073A9"
+                  />
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.page1}>{pageNumber} of {totalPages -1 }</Text>
+              <TouchableOpacity onPress={() => handleNextPage()}>
+                <Text>
+                  {" "}
+                  <MaterialIcons
+                    name="arrow-forward-ios"
+                    size={20}
+                    color="#0073A9"
+                  />
+                </Text>
+              </TouchableOpacity>
+            </Card.Content>
+        </Card>
+        <Card>
+          <Text></Text>
+        </Card>
+        <Card>
+          <Text></Text>
+        </Card>
+        <Card>
+          <Text></Text>
+        </Card>
+        <Card>
+          <Text></Text>
+        </Card>
       </View>
-    );
-  };
+      <View style={styles.footer}>
+        <Footer />
+      </View>
+    </View>
+  );
+};
+
+export default MaterialReturn;
+
+const styles = StyleSheet.create({
+  main1: {
+    backgroundColor: "#f6f9ff",
+    zIndex: -1,
+  },
+  remark: {},
+  submit: {
+    height: 40,
+    width: width - 300,
+    backgroundColor: "#0073A9",
+    borderRadius: 8,
+    marginLeft: 280,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnText: {
+    fontSize: 16,
+    color: "white",
+  },
+  page: {
+    flexDirection: "row",
+    alignItems: "center",
+    textAlign: "center",
+    paddingLeft: Dimensions.get("screen").width / 2.6,
+  },
+
+  container: {
+    position: "relative",
+    display: "flex",
+    height: Dimensions.get("screen").height + 430,
+    width: Dimensions.get("screen").width,
+  },
+
+  card: {
+    marginLeft: -10,
+    borderWidth: 1,
+    padding: 10,
+    margin: 5,
+  },
+  content: {
+    paddingBottom: 10,
+    fontSize: 17,
+    
+   
+  },
+  header: {
+    width:370,
+    paddingBottom: 10,
+    fontSize: 20,
+    fontWeight: "bold",
+   
+
+  },
+  content5: {
+    paddingBottom: 10,
+    fontSize:17
+  },
   
-  export default MaterialReturn;
-  
-  const styles = StyleSheet.create({
-    main1: {
-      backgroundColor: "#f6f9ff",
-      zIndex: -1,
-    },
-    page: {
-      flexDirection: "row",
-      alignItems: "center",
-      textAlign: "center",
-      paddingLeft: Dimensions.get("screen").width / 2.6,
-    },
-  
-    container: {
-      position: "relative",
-      display: "flex",
-      height: Dimensions.get("screen").height + 430,
-      width: Dimensions.get("screen").width,
-    },
-  
-    card: {
-      marginLeft: -10,
-      borderWidth:1,
-      padding:10,
-      margin:5,
-    },
-    content: {
-      paddingBottom: 10,
-      fontSize: 15,
-    },
-    page1: {
-      paddingBottom: 5,
-      fontSize: 15,
-    },
-    content1: {
-      paddingBottom: 10,
-  
-      fontSize: 15,
-      
-    },
-    content5:{
-      fontSize:20,
-      paddingBottom:10,
-      fontWeight:"bold"
-    },
-    content2: {
-      paddingTop: -20,
-      fontSize: 15,
-      
-    },
-    head: {
-      fontSize: 30,
-    },
-  
-    footer: {
-      position: "relative",
-      top: -465,
-      paddingTop: height * -3,
-    },
-  });
-  
+  page1: {
+    paddingBottom: 5,
+    fontSize: 17,
+  },
+  content1: {
+    paddingBottom: 10,
+
+    fontSize: 17,
+  },
+
+  content2: {
+    paddingTop: -20,
+    fontSize: 17,
+  },
+  head: {
+    fontSize: 30,
+  },
+
+  footer: {
+    position: "relative",
+    top: -465,
+    paddingTop: height * -3,
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

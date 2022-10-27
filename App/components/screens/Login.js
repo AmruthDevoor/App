@@ -144,8 +144,8 @@ const Login = ({ navigation }) => {
         )}
       </View>
       <FormNavigator
-          onLeftLinkPress={navigateToSignUp(navigation)}
-          leftLinkText="Sign up"
+          // onLeftLinkPress={navigateToSignUp(navigation)}
+          // leftLinkText="Sign up"
           onRightLinkPress={navigateToForgetPassword(navigation)}
           rightLinkText="Forget Password?"
         />

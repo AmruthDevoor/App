@@ -17,11 +17,19 @@ import {
 } from "react-native-responsive-dimensions";
 import { Card, Paragraph } from "react-native-paper";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const PlantHealthTask = () => {
   const [techId, setTechId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [plantTask, setPlantTask] = useState([]);
+  const navigation = useNavigation();
+  const onForm = (pid) => {
+   //console.warn(pid)
+    AsyncStorage.setItem ("planthealthtaskId",JSON.stringify(pid));
+    navigation.navigate("PlantHealthForm");
+  };
+
 
   useEffect(() => {
     AsyncStorage.getItem("id").then((value) => {
@@ -45,6 +53,7 @@ const PlantHealthTask = () => {
       },
     }).then((result) => {
       setPlantTask(result.data);
+      console.warn(result)
     });
   };
   const showAlert = (text) =>{
@@ -55,11 +64,15 @@ const PlantHealthTask = () => {
     
     <View>
     <Header />
-    <ScrollView style={styles.main1}>
+    <ScrollView style={styles.main1} >
       <Text style={styles.head}>Plant Health</Text>
       <View>
         {plantTask.map((plaTsk) => {
           return (
+            <TouchableOpacity  onPress={(e)=>{
+              onForm(plaTsk.planthealthtaskId)
+              console.warn(plaTsk.planthealthtaskId)
+                          }}>
             <Card style={styles.card}>
               <View style={{flexDirection:"row" ,backgroundColor:"skyblue"}}>
               <Text style={styles.title}>{plaTsk.planthealthtaskName}</Text>
@@ -96,6 +109,7 @@ const PlantHealthTask = () => {
                 </View>
               </Card.Content>
             </Card>
+            </TouchableOpacity>
           );
         })}
 

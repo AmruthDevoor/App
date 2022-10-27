@@ -63,7 +63,7 @@ import {
       return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo };
       
     });
-    console.warn(AssignedProduct)
+   // console.warn(AssignedProduct)
     const getAllPlants = () => {
       axios({
         method: "GET",
@@ -102,7 +102,7 @@ import {
         
       });
     };
-    console.warn(product)
+   // console.warn(product)
   
     const renderLabel = () => {
       if (value || isFocus) {
@@ -144,6 +144,7 @@ import {
             },
             data:data,
       }).then((res)=>{console.warn(res)});
+      alert("sucessfully Created")
       
     };
     return (
