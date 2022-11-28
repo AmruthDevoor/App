@@ -205,7 +205,7 @@ paddingBottom:10
   
     footer: {
       position: "relative",
-      top: -465,
+      top: -475,
       paddingTop: height * -3,
     },
   });

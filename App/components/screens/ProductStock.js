@@ -59,7 +59,7 @@ const ProductStock = () => {
       </DataTable.Header>
      
           
-                     {product.map((pro)=>{
+                     {product.length <= 0 ? <Text>No Data Found</Text> : product.map((pro)=>{
             return(
              <DataTable.Row  >
         <DataTable.Cell>{pro.productDto.productName
@@ -87,7 +87,7 @@ const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
 footer:{
-  marginTop: -450,
+  marginTop: -460,
   zIndex:-1,
 },
 head:{

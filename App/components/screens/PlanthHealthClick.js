@@ -27,7 +27,11 @@ import {
   
     const [planthealthtaskId, setPlanthealthtaskId] = useState("");
     const [techId, setTechId] = useState("");
-  
+    const [spunImageName,setSpunImageName]=useState("")
+  const [spunImagePath,setSpunImagePath]=useState("")
+  const [plantImagePath,setPlantImagePath]=useState("")
+  const [logImagePath,setLogImagePath]=useState("")
+
     const [serviceDate, setServiceDate] = useState("");
     const [remark, setRemark] = useState("");
     const [plantClean, setPlantClean] = useState("Plant Clean");
@@ -55,6 +59,7 @@ import {
       });
       AsyncStorage.getItem("planthealthtaskId").then((value) => {
         setPlanthealthtaskId(value);
+        console.warn(value)
        
       });
       getPlanthealthtaskId();
@@ -80,8 +85,9 @@ import {
           Authorization: "Bearer " + accessToken,
         },
       }).then((result) => {
+        console.warn(result)
         var taskPlantData = result.data;
-  
+       
         setServiceDate(moment(taskPlantData.serviceDate).format("L"))
         setRemark(taskPlantData.remark)
         setSpun(taskPlantData.spun)
@@ -91,14 +97,18 @@ import {
         setSpunSlimPlain(taskPlantData.spunSlimPlain)
         setLogEntry(taskPlantData.logEntry)
         setStatus(taskPlantData.status)
-
+        setSpunImagePath(taskPlantData.spunImagePath)
+        setPlantImagePath(taskPlantData.plantImagePath)
+        setLogImagePath(taskPlantData.logImagePath)
         setPlantClean(taskPlantData.plantClean)
 
         setInsertedDate(moment(taskPlantData.insertedDate).format("L"))
       
       });
+     
     };
-  
+    const imageUrl =
+    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
     return (
       <View>
         <Header />
@@ -116,18 +126,90 @@ import {
         <Text style={Styles.text} >spunSlimPlain : {spunSlimPlain}</Text>
         <Text style={Styles.text} >logEntry: {logEntry}</Text>
         <Text style={Styles.text} >status: {status}</Text>
-
+       
         <View>
           <Text style={Styles.text}>spunImage : </Text>
-        <Image style={{width:130,height:130, borderWidth:2,borderColor:"black"}} source={(spunImage===null || spunImage==="" )? require("../../assets/noImage.jpg") : oldpicPath}  />
+          <View>
+                {/* <Image  /> */}
+                {spunImagePath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+spunImagePath}}
+                    
+                  />
+                )}
+              </View>
         </View>
         <View>
           <Text style={Styles.text}>Plant Image : </Text>
-        <Image style={{width:130,height:130, borderWidth:2,borderColor:"black"}} source={(plantImage===null || plantImage==="" )? require("../../assets/noImage.jpg") : oldpicPath}  />
+          <View>
+                {/* <Image  /> */}
+                {plantImagePath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+plantImagePath}}
+                    
+                  />
+                )}
+              </View>
         </View>
         <View>
           <Text style={Styles.text}>log Image : </Text>
-        <Image style={{width:130,height:130, borderWidth:2,borderColor:"black"}} source={(logImage===null || logImage==="" )? require("../../assets/noImage.jpg") : oldpicPath}  />
+          <View>
+                {/* <Image  /> */}
+                {logImagePath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+logImagePath}}
+                    
+                  />
+                )}
+              </View>
         </View>
         <Text></Text>
        

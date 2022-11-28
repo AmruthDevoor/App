@@ -158,7 +158,7 @@ const viewItem = ({item}) => {
                     <Text style={styles.content5}>
                       Status: {LeaveReq.status}
                     </Text>
-                  </Card.Content>
+                  </Card.Content>a
                   <Card.Content style={styles.remark}>
                     <Text style={styles.content5}>
                       Description:{"\n"}{LeaveReq.description}
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
 
   footer: {
     position: "relative",
-    top: -465,
+    top: -475,
     paddingTop: height * -3,
   },
 });

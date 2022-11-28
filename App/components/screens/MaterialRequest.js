@@ -102,8 +102,12 @@ const viewItem = ({item}) => {
      <Text style={styles.content5}>Quantity : {item.quantity}</Text>
      </Card.Content>
      <Card.Content style={styles.remark}>   
+     <Text style={styles.content5}>Status :{"\n"} {item.status}</Text>
+     </Card.Content>
+     <Card.Content style={styles.remark}>   
      <Text style={styles.content5}>Remark :{"\n"} {item.remark}</Text>
      </Card.Content>
+     
    
      
      </Card>
@@ -307,7 +311,7 @@ const styles = StyleSheet.create({
 
   footer: {
     position: "relative",
-    top: -465,
+    top: -475,
     paddingTop: height * -3,
   },
 });

@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Card, Button, Title, Paragraph } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const CreateCard4 = ({no}) => {
+  const[update,setUpdate] = useState(false)
 	const navigation = useNavigation();
 	const onCollection = () => {
 		navigation.navigate("Collection");
+    setUpdate(true)
 	  };
+    useEffect(() => {
+      AsyncStorage.getItem("id").then((value) => {
+        setTechId(value);
+      });
+      AsyncStorage.getItem("AccessToken").then((value) => {
+        setAccessToken(JSON.parse(value));
+      });
+      
+    },[update]);
   return (
     <Card style={Styles.container} >
       <Card.Content >

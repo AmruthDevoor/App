@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
 
   footer: {
     position: "relative",
-    top: -465,
+    top: -475,
     paddingTop: height * -3,
   },
 });

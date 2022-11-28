@@ -5,6 +5,7 @@ import {
   Button,
   ScrollView,
   Dimensions,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -22,10 +23,12 @@ import axios from "axios";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PlantHealthCard from "../Cards/PlantHealthCard";
-// import MyTabs from "./BottomTab";
+
 const { width, height } = Dimensions.get("window");
 
 const HomeScreen = () => {
+  const [userName, setuserName] = useState("");
+  const[update,setUpdate] = useState(false)
   const [noTotalService, setNoTotalService] = useState("");
   const [noTotalCollection,setNoTotalCollection] = useState("");
   const [noTotlaPlantHealth,setNoTotalPlantHealth] = useState("");
@@ -45,15 +48,22 @@ const HomeScreen = () => {
     AsyncStorage.getItem("id").then((value) => {
       setTechId(value);
     });
+    AsyncStorage.getItem("user").then((value) => {
+      setuserName(JSON.parse(value));
+    });
     AsyncStorage.getItem("AccessToken").then((value) => {
       setAccessToken(JSON.parse(value));
     });
-
+    setTimeout(() => {
+    setUpdate(!update)
+   }, 1000);
+   get_user();
+    totalCount();
     noOfTasksAndCollection();
-  }, [accessToken]);
+  }, [accessToken,update]);
   const noOfTasksAndCollection = () => {
     axios({
-      method: "GET",
+      method: "GET", 
       url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/dashboard/v1/technicianDashboardPendingCount/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
@@ -67,18 +77,23 @@ const HomeScreen = () => {
 
     });
   };
+  const get_user = () => {
 
-
-  useEffect(() => {
-    AsyncStorage.getItem("id").then((value) => {
-      setTechId(value);
+    axios({
+      method: "GET",
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/login/login/v1/getTechnicianProfileByUserName/{userName}?userName=${userName}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((res) => {
+  
+      
+    
     });
-    AsyncStorage.getItem("AccessToken").then((value) => {
-      setAccessToken(JSON.parse(value));
-    });
+  };
 
-    totalCount();
-  }, [accessToken]);
+
   const totalCount = () => {
     axios({
       method: "GET",
@@ -114,7 +129,7 @@ const HomeScreen = () => {
           </View>
 
           <View>
-            <CreateCard4 no={noCollection} />
+            <CreateCard4  no={noCollection} />
             <CreateCard5 no={noTasks} />
             <Text></Text>
             <Text></Text>
@@ -160,7 +175,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "relative",
-    top: -460,
+    top: -475,
     paddingTop: height * -3,
   },
 });

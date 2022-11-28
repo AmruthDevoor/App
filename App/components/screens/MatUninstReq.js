@@ -21,11 +21,12 @@ import {
   const MatUninstReq = () => {
     const [value, setValue] = useState();
   
-    const [selected, setSelected] = React.useState("");
+    const [selected, setSelected] = React.useState({});
     const [proSelected, setProSelected] = React.useState("");
 
     const [productSelected, setProductSelected] = React.useState("");
-  
+    const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
+
   
     const [isFocus, setIsFocus] = useState(false);
   
@@ -55,14 +56,17 @@ import {
       getAssignedProduct();
 
     }, [accessToken]);
-  
-    const AllPlants = plant.map((p) => {
+    const plantArray=[{id:0,name:"nothing to select"}]
+    const AllPlants =plant.length <= 0 ?plantArray.map((p) =>{ return { key: p.id, value: p.name }}) : plant.map((p) => {
       return { key: p.plantId, value: p.plantName };
     });
-    const AssignedProduct = product.map((ap) => {
-      return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo };
+    // const AllPlants = plant.map((p) => {
+    //   return { key: p.plantId, value: p.plantName };
+    // });
+    // const AssignedProduct = product.map((ap) => {
+    //   return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo };
       
-    });
+    // });
    // console.warn(AssignedProduct)
     const getAllPlants = () => {
       axios({
@@ -164,7 +168,7 @@ import {
           /> */}
            
            <SelectList
-        
+         defaultOptions={defaultMaterial}
             setSelected={setSelected}
             data={AllPlants}
             onSelect={() => alert(selected)}

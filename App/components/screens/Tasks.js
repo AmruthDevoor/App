@@ -44,7 +44,7 @@ const navigation = useNavigation();
     });
     
     getTaskData();
-  },[accessToken]);
+  },[accessToken,taskId,task]);
   
   const getTaskData = () => {
     axios({
@@ -68,7 +68,7 @@ const navigation = useNavigation();
     <ScrollView style={styles.main1}>
       <Text style={styles.head}>Task</Text>
       <View>
-        {task.map((tsk) => {
+        {task.length <= 0 ? <Text>No Data Found</Text> :task.map((tsk) => {
           return (
             <TouchableOpacity onPress={(e)=>{
 onForm(tsk.taskId)
@@ -156,7 +156,7 @@ zIndex:-1,
   footer: {
     zindex: -1,
 
-    marginTop:-580,
+    marginTop:-590,
     position: "relative",
    
   },

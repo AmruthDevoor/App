@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useState } from "react";
 import FormContainer from "../FormContainer";
 import AppInput from "../AppInput";
@@ -20,8 +20,8 @@ const NewPasswordScreen = () => {
      otp:otp
     })
       .then((result) => {
-
-        navigation.replace("LogIn");
+Alert.alert("Password Updated Sucessfully")
+        navigation.replace("Login");
       })
       .catch((err) => {
         console.error(err);

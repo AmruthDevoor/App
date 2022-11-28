@@ -68,6 +68,7 @@ const ProductUninstallation = () => {
       setTotalPages(result.data.totalPages);
 
       setProductInstall(result.data.content);
+      
     });
   };
 
@@ -83,6 +84,8 @@ const handleNextPage = () => {
 
     
 }
+const imageUrl =
+"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
   
 const viewItem = ({item}) => {
   return (
@@ -118,7 +121,28 @@ const viewItem = ({item}) => {
      </Card.Content>
      <View style={{flexDirection:"row", marginLeft:220,marginTop:-130,marginBottom:10}}>
                                    <Card.Content >
-                 <Image source = {require("../../assets/noImage.jpg")} style={{width:130,height:130}} />
+                                   {item.picPath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+item.picPath}}
+                    
+                  />
+                )}
                  </Card.Content>
                 </View>
      
@@ -127,6 +151,7 @@ const viewItem = ({item}) => {
       </View>
   )
 }
+
 
   return (
     <View style={styles.container}>

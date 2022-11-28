@@ -33,7 +33,7 @@ import {
   import AsyncStorage from "@react-native-async-storage/async-storage";
   import { MaterialIcons } from "@expo/vector-icons";
   import { useNavigation } from "@react-navigation/native";
-  // import MyTabs from "./BottomTab";
+  
   const { width, height } = Dimensions.get("window");
   
   const PlantHealthSide = () => {
@@ -342,7 +342,7 @@ import {
   
     footer: {
       position: "relative",
-      top: -465,
+      top: -475,
       paddingTop: height * -3,
     },
   });

@@ -44,6 +44,7 @@ const TaskSideClick = () => {
     });
     AsyncStorage.getItem("serviceId").then((value) => {
       setTaskId(value);
+      console.warn("hi"+value)
      
     });
     getTaskId();
@@ -65,7 +66,7 @@ const TaskSideClick = () => {
     
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getServiceTaskTaskId/{taskId}?taskId=${taskId}`,
+      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getServiceTaskByTaskId/{taskId}?taskId=${taskId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -85,12 +86,13 @@ const TaskSideClick = () => {
     });
   };
   
-
+  const imageUrl =
+    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
   return (
     <View>
-      <Header />
+       <Header />
       <ScrollView style={{zIndex:-1}}>
-      <Card style={{padding:10, margin:10}}>
+      <Card style={{padding:10, margin:10,marginTop:30}}>
       <Text style={{ fontSize: 30, marginBottom: 10, zIndex: -1 }}>Service Tasks</Text>
       <View >
       <Text style={Styles.text}>Date: {serviceDate}</Text>
@@ -98,12 +100,60 @@ const TaskSideClick = () => {
       
       <View>
         <Text style={Styles.text}>Old Image : </Text>
-      <Image style={{width:130,height:130, borderWidth:2,borderColor:"black"}} source={(oldpicPath===null || oldpicPath==="") ? require("../../assets/noImage.jpg") : oldpicPath}  />
+        <View>
+                {/* <Image  /> */}
+                {oldpicPath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+oldpicPath}}
+                    
+                  />
+                )}
+              </View>
       </View>
       <Text></Text>
       <View>
         <Text style={Styles.text}>New Image : </Text>
-      <Image style={{width:130,height:130, borderWidth:2,borderColor:"black"}} source={(newpicPath===null || newpicPath==="")? require("../../assets/noImage.jpg") : newpicPath}  />
+      <View>
+                {/* <Image  /> */}
+                {newpicPath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+newpicPath}}
+                    
+                  />
+                )}
+              </View>
       </View>
       <Text style={Styles.text}>InsertedDate: {insertedDate}</Text>
       <Text style={Styles.text}>status: {status}</Text>

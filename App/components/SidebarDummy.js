@@ -189,7 +189,7 @@ const Styles = StyleSheet.create({
 
   },
   content: {
-    height:60,
+    height:65,
     width: 226,
 
     paddingLeft: -30,
@@ -197,13 +197,13 @@ const Styles = StyleSheet.create({
 
     shadowColor: "#0073A9",
 
-    paddingTop: -2,
+    paddingTop: 8,
     marginLeft: -30,
   },
   text: {
     fontSize: 17,
     paddingLeft: 50,
-    paddingTop: 10,
+    paddingTop: 9,
 
     color: "black",
   },

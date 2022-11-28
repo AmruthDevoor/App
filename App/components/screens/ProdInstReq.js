@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     SafeAreaView,
     Alert,
+    ScrollView,
   } from "react-native";
   import React, { useEffect, useState } from "react";
   import { useNavigation } from "@react-navigation/native";
@@ -41,16 +42,18 @@ import { Image } from "react-native";
     const navigation = useNavigation();
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState("date");
-   
+    const [profileImage, setProfileImage] = useState("");
     const [showw, setShoww] = useState(false);
     const [value, setValue] = useState();
     const [image, setImage] = useState(null);
-    const [selected, setSelected] = React.useState("");
-    const [proSelected, setProSelected] = React.useState("");
-
+    const [selected, setSelected] = React.useState({});
+    const [proSelected, setProSelected] = React.useState({});
+    const[display,setDisplay]=useState()
     const [productSelected, setProductSelected] = React.useState("");
   
-  
+    const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
+    const[defaultProduct,setDefaultProduct]=useState({key:0, value:"select"})
+
     const [isFocus, setIsFocus] = useState(false);
   
     const [accessToken, setAccessToken] = useState("");
@@ -58,7 +61,7 @@ import { Image } from "react-native";
     const [plant, setPlant] = useState([]);
     const [product, setProduct] = useState([]);
   
-    const [totQuan, setQuantity] = useState();
+    const [totQuan, setQuantity] = useState("1");
     const [productSerialNo,setProductSerialNo] = useState();
    const[plantId,setPlantId]= useState("")
    const[productHandoverId,setProductHandoverId]= useState("")
@@ -66,6 +69,7 @@ import { Image } from "react-native";
 const[productName,setProductName]=useState("")
 const[installationDate,setInstallationDate]=useState("")
     const [remark, setRemark] = useState("");
+    const [filename,setFilename]= useState();
     const [techId, setTechId] = useState();
     const onFromChange = (event, selectedDate) => {
       const currentDate = selectedDate || date;
@@ -86,21 +90,7 @@ const[installationDate,setInstallationDate]=useState("")
       setShoww(true);
       setMode(currentMode);
     };
-    const pickImage = async () => {
-      // No permissions request is necessary for launching the image library
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-     // console.log(result);
-  
-      if (!result.cancelled) {
-        setImage(result.uri);
-      }
-    };
+   
     
     useEffect(() => {
       AsyncStorage.getItem("AccessToken").then((value) => {
@@ -115,13 +105,24 @@ const[installationDate,setInstallationDate]=useState("")
 
     }, [accessToken,techId,show]);
   
-    const AllPlants = plant.map((p) => {
+    const plantArray=[{id:0,name:"nothing to select"}]
+    const AllPlants =plant.length <= 0 ?plantArray.map((p) =>{ return { key: p.id, value: p.name }}) : plant.map((p) => {
       return { key: p.plantId, value: p.plantName };
     });
-    const AssignedProduct = product.map((ap) => {
-      return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo, };
+
+    // const AllPlants = plant.map((p) => {
+    //   return { key: p.plantId, value: p.plantName };
+    // });
+    const productArray=[{id:0,name:"Nothing to select"}]
+  const AssignedProduct =product.length <=0 ? productArray.map((ap) =>{ return { key: ap.id, value: ap.name }}) : product.map((ap) => {
+    return {
+      key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo, 
+    };
+  });
+    // const AssignedProduct = product.map((ap) => {
+    //   return { key: ap.productHandoverId, value: (ap.productName===null)? "no name":ap.productName ,ser:ap.productSerialNo, };
       
-    });
+    // });
    
     const getAllPlants = () => {
       axios({
@@ -180,28 +181,33 @@ const[installationDate,setInstallationDate]=useState("")
    if(totQuan===""){
   Alert.alert("Please enter the quantity")}
 else if(totQuan==0){
-    Alert.alert("Quantity cannot be 0")
+    Alert.alert("Quantity cannot be 0");
   }
   else if(remark==="")
-  Alert.alert("Please enter the remark")
+  Alert.alert("Please enter the remark");
+  else if (display != "201") {
+    Alert.alert("Please select pic");
+  
+  }
   else{
       e.preventDefault();
      
   
       let data ={
-        "plantDto": {
-          "plantId": selected
+        plantDto: {
+          plantId: selected
         },
-        "productHandoverDto": {
-          "productHandoverId": proSelected
+        productHandoverDto: {
+          productHandoverId: proSelected
         },
-        "productName":productName,
-        "productSerialNo": productSerialNo,
-        "quantity": totQuan,
-        "remark": remark,
-        "installationDate":installationDate,
-        "technicianDto": {
-          "technicianId": techId
+        productName:productName,
+        productSerialNo: productSerialNo,
+        quantity: totQuan,
+        remark: remark,
+        installationDate:installationDate,
+        picName: filename,
+        technicianDto: {
+          technicianId: techId
         }
       } 
       
@@ -216,21 +222,107 @@ else if(totQuan==0){
       }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("ProductInstallation")});
     }
     };
+    const pickImage = async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+      }
+  
+      if (status === "granted") {
+        const response = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+        });
+        var fn = response.uri.substring(
+          response.uri.lastIndexOf("/") + 1,
+          response.uri.length
+        );
+        console.warn(fn);
+        setFilename(fn);
+  
+        if (!response.cancelled) {
+          setProfileImage(response.uri);
+          console.warn(response.uri);
+          console.warn(response);
+        }
+      }
+    };
+    const pickCamera = async () => {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+      }
+  
+      if (status === "granted") {
+        const response = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+        });
+        var fn = response.uri.substring(
+          response.uri.lastIndexOf("/") + 1,
+          response.uri.length
+        );
+        console.warn(fn);
+        setFilename(fn);
+  
+        if (!response.cancelled) {
+          setProfileImage(response.uri);
+          console.warn(response.uri);
+          console.warn(response);
+        }
+      }
+    };
+    const uploadImage = async () => {
+      console.warn({
+        name: filename,
+        uri: profileImage,
+        type: "image/jpg",
+      });
+  
+      const formData = new FormData();
+      formData.append("file", {
+        name: filename,
+        uri: profileImage,
+        type: "image/jpg",
+      });
+      try {
+        axios({
+          method: "POST",
+          url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data; ",
+            Authorization: "Bearer " + accessToken,
+          },
+        }).then((res) => {
+          setDisplay(res.data.responseCode)
+          Alert.alert("Image Uploaded Successfully")
+        });
+      } catch (error) {
+        console.warn(error.message);
+      }
+    };
     return (
       <View>
+         <ScrollView> 
         <Header />
         <Text style={{fontSize:35 , marginBottom:20,zIndex:-1}} >Install a Product</Text>
-        <View style={Styles.container}>
+       
+           <View style={Styles.container}>
           {renderLabel()}
   
   <SafeAreaView>
   <SelectList
+  defaultOptions={defaultMaterial}
             setSelected={setProSelected}
             data={AssignedProduct}
             onSelect={() =>getByProductHandoverId(proSelected)}
            
             placeholder="Select A Product"
           />
+          <Text style={{marginTop:20}}>Product Name :</Text>
           <TextInput
             placeholder="Product Name"
           
@@ -241,6 +333,7 @@ else if(totQuan==0){
             }}
             style={Styles.inp}
           />
+          <Text style={{marginTop:20}}>Serial No : </Text>
   <TextInput
             placeholder="serial no"
             value={productSerialNo}
@@ -248,31 +341,83 @@ else if(totQuan==0){
             
             style={Styles.inp2}
           />
-  
- 
-           
-          
+  <Text style={{marginTop:20}}>Quantity : </Text>
           <TextInput
             placeholder="Quantity"
           
             value={totQuan}
             keyboardType="numeric"
-            onChangeText={(text) => {
-              setQuantity(text);
-            }}
+          
             style={Styles.quan}
           />
           
      
          <SelectList
-        
+        defaultOptions={defaultProduct}
             setSelected={setSelected}
             data={AllPlants}
             onSelect={() => alert(selected)}
             placeholder="Select A Plant"
           />
+          <Text style={{marginTop:15}}>FileName : </Text>
+          <View style={{ flexDirection: "row" }}>
+ <Text
+             
+             style={{ borderWidth: 0.5,borderRadius:5, padding: 10,width:330 }}>
+               
+             {filename}
+             </Text>
+             {display=="201"?
+              <Text>
+              <MaterialIcons
+                  style={Styles.icon}
+                  name="done"
+                  size={30}
+                  color="green"
+                />
+              </Text>: ""}
+              </View>
+           <View style={{ flexDirection: "row" }}>
+             <TouchableOpacity
+               onPress={pickImage}
+               style={Styles.buttonStyle}
+               activeOpacity={0.5}
+             >
+               <MaterialIcons
+                 style={Styles.icon}
+                 name="collections"
+                 size={30}
+                 color="white"
+               />
+             </TouchableOpacity>
+             <TouchableOpacity
+               onPress={pickCamera}
+               style={Styles.buttonStyle}
+               activeOpacity={0.5}
+             >
+               <MaterialIcons
+                 style={Styles.icon}
+                 name="photo-camera"
+                 size={30}
+                 color="white"
+               />
+             </TouchableOpacity>
+
+             <TouchableOpacity
+               onPress={uploadImage}
+               style={Styles.buttonStyle}
+               activeOpacity={0.5}
+             >
+               <MaterialIcons
+                 style={Styles.icon}
+                 name="file-upload"
+                 size={30}
+                 color="white"
+               />
+             </TouchableOpacity>
+           </View>
           <View>
-            <Text style={{ fontSize: 15 ,paddingTop:10}}>Installation Date: {installationDate}</Text>
+            <Text style={{ fontSize: 15 ,paddingTop:10,marginTop:10}}>Installation Date: {installationDate}</Text>
             <View>
               <TouchableOpacity>
               <Text style={{backgroundColor:"#0073A9",color:"white",width:350,height:30,textAlign:"center",paddingTop:7 }}  onPress={() => showMode("date")} >
@@ -291,6 +436,7 @@ else if(totQuan==0){
               />
             )}
           </View>
+          <Text style={{marginTop:20}}>Remark : </Text>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -308,6 +454,7 @@ else if(totQuan==0){
             </Pressable>
           </TouchableOpacity>
         </View>
+        </ScrollView>
       </View>
     );
   };
@@ -338,30 +485,44 @@ else if(totQuan==0){
       height: 50,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
+      marginTop: 5,
       paddingLeft: 10,
     },
     quan: {
       height: 50,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
+      marginTop: 5,
       marginBottom:20,
       paddingLeft: 10,
+    },
+    buttonStyle: {
+      backgroundColor: "#307ecc",
+      borderWidth: 0,
+      color: "#FFFFFF",
+      borderColor: "#307ecc",
+      height: 40,
+      width: 100,
+      alignItems: "center",
+      borderRadius: 10,
+      marginLeft: 1,
+      marginRight: 30,
+      marginTop: 10,
+      marginBottom: 10,
     },
     inp2: {
       height: 50,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
-      marginBottom:20,
+      marginTop: 5,
+      marginBottom:3,
       paddingLeft: 10,
     },
     inp1: {
       height: 100,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
+      marginTop: 5,
       paddingLeft: 10,
       paddingBottom: 50,
     },
@@ -374,7 +535,7 @@ else if(totQuan==0){
       paddingHorizontal: 8,
     },
     icon: {
-      marginRight: 5,
+     paddingTop: 5,
     },
     label: {
       position: "absolute",

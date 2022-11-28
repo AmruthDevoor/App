@@ -50,16 +50,16 @@ const Material = () => {
             <Text style={styles.text}>Installation</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button}  onPress={onMaterialUninstall}>
-            <Text style={styles.text}>Uninstallation</Text>
+            <Text style={styles.text}>Exchange</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity style={styles.button} onPress={onMaterialRequest} >
             <Text style={styles.text}>Material Request</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} >
+          {/* <TouchableOpacity style={styles.button} >
             <Text style={styles.text}>Shifting</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
          
         </View>
       </ScrollView>
@@ -76,7 +76,7 @@ export default Material;
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   footer: {
-    marginTop: -40,
+    marginTop: -55,
   },
   button: {
     backgroundColor: "#0073A9",

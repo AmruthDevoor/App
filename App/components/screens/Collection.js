@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const Collection = () => {
   const [techId, setTechId] = useState("");
+  const [collectiontaskId, setCollectiontaskId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [task, setTask] = useState([]);
   const navigation = useNavigation();
@@ -40,7 +41,7 @@ const Collection = () => {
     });
 
     getTaskData();
-  }, [accessToken]);
+  }, [accessToken,collectiontaskId,task]);
 
   const getTaskData = () => {
     axios({
@@ -63,7 +64,7 @@ const Collection = () => {
       <ScrollView style={styles.main1}>
         <Text style={styles.head}>Collection</Text>
         <View>
-          {task.map((tsk) => {
+          {task.length<=0 ? <Text>No Data Found</Text> : task.map((tsk) => {
             return (
               <TouchableOpacity onPress={(e)=>{
                 onForm(tsk.collectiontaskId)
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   footer: {
     zindex: -1,
 
-    marginTop: -580,
+    marginTop: -590,
     position: "relative",
   },
   Content: {
@@ -191,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-//how to access a nested array?
+//what is the syntax of ternary operator?

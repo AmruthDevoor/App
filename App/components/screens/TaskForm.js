@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Image,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
@@ -18,21 +20,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DocumentPicker from "react-native-document-picker";
 import Header from "../AppHeader";
 import axios from "axios";
-
+import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 const TaskForm = () => {
+  const [profileImage, setProfileImage] = useState("");
+  const [profileImage1, setProfileImage1] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [filename, setFilename] = useState();
+  const [filename1, setFilename1] = useState();
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
- 
+  const[display,setDisplay]=useState()
+  const[display1,setDisplay1]=useState()
   const [show, setShow] = useState(false);
+  const [showw, setShoww] = useState(false);
   const [accessToken, setAccessToken] = useState("");
   const [taskId, setTaskId] = useState("");
   const [techId, setTechId] = useState("");
   const [serviceDate, setServiceDate] = useState("");
   const [remark, setRemark] = useState("");
-  const [oldpicName, setOldpicName] = useState("");
-  const [newpicName, setNewpicName] = useState("");
+  const [status, setStatus] = useState("");
+
   const [image, setImage] = useState(null);
-  const [singleFile, setSingleFile] = useState(null);
+  const [image1, setImage1] = useState(null);
+
+  const navigation = useNavigation();
   const onFromChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
 
@@ -64,7 +76,7 @@ const TaskForm = () => {
       setTaskId(value);
     });
     getTaskId();
-  }, [accessToken,techId,taskId]);
+  }, [accessToken, techId, taskId]);
 
   const getTaskId = () => {
     axios({
@@ -80,41 +92,52 @@ const TaskForm = () => {
   };
 
   const requestTask = (e) => {
-    if(remark===""){
-      Alert.alert("Please enter te remark")
-}else{
-    e.preventDefault();
+    if (remark === "") {
+      Alert.alert("Please enter te remark");
+    } 
+    else if (display != "201") {
+      Alert.alert("Please select old pic");
+    
+    }
+    else if (display1 != "201") {
+      Alert.alert("Please select new pic");
+    
+    }
+     else {
+      e.preventDefault();
 
-    let data = {
-      newpicName: newpicName,
-      oldpicName: oldpicName,
-      remark: remark,
-      serviceDate: serviceDate,
-      taskDto: {
-        taskId: taskId,
-      },
-      technicianDto: {
-        technicianId: techId,
-      },
-    };
-    console.warn(data);
-    axios({
-      method: "POST",
-      url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/postServiceTask",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-      data: data,
-    }).then((res) => {
-      console.warn(res);
-    });
-    alert("Sucessfully submitted");
-  };}
-  
-   
+      let data = {
+        oldpicName: filename,
+        newpicName: filename1,
+
+        remark: remark,
+        status: status,
+        serviceDate: serviceDate,
+        taskDto: {
+          taskId: taskId,
+        },
+        technicianDto: {
+          technicianId: techId,
+        },
+      };
+      console.warn(data);
+      axios({
+        method: "POST",
+        url: " https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/postServiceTask",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+        data: data,
+      }).then((res) => {
+        alert(res.data.message);
+        navigation.navigate("Tasks");
+      });
+    }
+  };
+
   //   if (singleFile != null) {
-     
+
   //     const fileToUpload = singleFile;
   //     let dataa = new FormData();
   //     dataa.append('name', 'Image Upload');
@@ -133,9 +156,204 @@ const TaskForm = () => {
   //     });
   //   }
   // };
-  
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+      });
+      var fn = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn);
+      setFilename(fn);
+
+      if (!response.cancelled) {
+        setProfileImage(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickCamera = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+      });
+      var fn = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn);
+      setFilename(fn);
+
+      if (!response.cancelled) {
+        setProfileImage(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickImage1 = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+      });
+      var fn1 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn1);
+      setFilename1(fn1);
+
+      if (!response.cancelled) {
+        setProfileImage1(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickCamera1 = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+      });
+      var fn1 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn1);
+      setFilename1(fn1);
+
+      if (!response.cancelled) {
+        setProfileImage1(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const uploadImage = async () => {
+    console.warn({
+      name: filename,
+      uri: profileImage,
+      type: "image/jpg",
+    });
+
+    const formData = new FormData();
+    formData.append("file", {
+      name: filename,
+      uri: profileImage,
+      type: "image/jpg",
+    });
+    try {
+      axios({
+        method: "POST",
+        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data; ",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((res) => {
+        setDisplay(res.data.responseCode)
+        Alert.alert("Old Image Updated Successfully")
+      });
+    } catch (error) {
+      console.warn(error.message);
+    }
+  };
+  const uploadImage1 = async () => {
+    console.warn({
+      name: filename1,
+      uri: profileImage1,
+      type: "image/jpg",
+    });
+
+    const formData = new FormData();
+    formData.append("file", {
+      name: filename1,
+      uri: profileImage1,
+      type: "image/jpg",
+    });
+    try {
+      axios({
+        method: "POST",
+        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data; ",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((res) => {
+        setDisplay1(res.data.responseCode)
+        Alert.alert("New Image Updated Successfully")
+      });
+    } catch (error) {
+      console.warn(error.message);
+    }
+  };
+  // const uploadImage1 = async () => {
+  //   console.warn({
+  //     name: filename1,
+  //     uri: profileImage1,
+  //     type: 'image/jpg',
+  //   })
+
+  //   const formData = new FormData();
+  //   formData.append('file', {
+  //     name: filename1,
+  //     uri: profileImage1,
+  //     type: 'image/jpg',
+  //   });
+  //   try{
+  //     axios({
+  //             method: "POST",
+  //              url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+  //              data:formData,
+  //              headers: {
+  //                "Content-Type": "multipart/form-data; ",
+  //                Authorization: "Bearer " + accessToken,
+  //              },
+
+  //            }).then((res) => {
+  //                 console.warn(res);
+  //                  });
+  //   }
+  //   catch (error) {
+  //     console.warn(error.message);
+  //   }}
+
   return (
-    <View>
+    <ScrollView>
       <Header />
       <Text style={{ fontSize: 35, marginBottom: 20, zIndex: -1 }}>Tasks</Text>
       <View style={Styles.container}>
@@ -156,46 +374,140 @@ const TaskForm = () => {
               />
             )}
           </View>
-         
+
           <Text></Text>
-          <Text style={{borderWidth:1,padding:10}}>old image name</Text>
-<View style={{flexDirection:"row"}}>
-          <TouchableOpacity
-        style={Styles.buttonStyle}
-        activeOpacity={0.5}
-        >
-        <Text style={Styles.buttonTextStyle}>Select Old Image</Text>
-        </TouchableOpacity>
+          
+          <Text>Old File Name : </Text>
+          <View style={{ flexDirection: "row" }}>
+          <Text style={{ borderWidth: 1, padding:5,width:330}}>
+          {filename}
+          </Text>
+          {display=="201"?
+              <Text>
+              <MaterialIcons
+                  style={Styles.icon}
+                  name="done"
+                  size={30}
+                  color="green"
+                />
+              </Text>: ""}
+            </View>
+            
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={pickImage}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="collections"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={pickCamera}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="photo-camera"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={uploadImage}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="file-upload"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+          </View>
+          {image1 && (
+            <Image
+              source={{ uri: image1 }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+           <Text style={{marginTop:10}}>
+             New File Name : 
+           </Text>
+           <View style={{ flexDirection: "row" }}>
         
-       
-        <TouchableOpacity
-        style={Styles.buttonStyle}
-        activeOpacity={0.5}
-       >
-        <Text style={Styles.buttonTextStyle}>Upload old Image</Text>
-      </TouchableOpacity>
-    
-      </View>
-      <Text style={{borderWidth:1,padding:10,marginTop:10}}>New image name</Text>
-      <View style={{flexDirection:"row"}}>
-          <TouchableOpacity
-        style={Styles.buttonStyle}
-        activeOpacity={0.5}
-        >
-        <Text style={Styles.buttonTextStyle}>Select New Image</Text>
-        </TouchableOpacity>
-        
-       
-        <TouchableOpacity
-        style={Styles.buttonStyle}
-        activeOpacity={0.5}
-       >
-        <Text style={Styles.buttonTextStyle}>Upload New Image</Text>
-      </TouchableOpacity>
-    
-      </View>
+            
+          <Text style={{ borderWidth: 1, padding: 5, marginTop: 1,width:330}}>
+          {filename1}
+          </Text>
+          {display1=="201"?
+              <Text>
+              <MaterialIcons
+                  style={Styles.icon}
+                  name="done"
+                  size={30}
+                  color="green"
+                />
+              </Text>: ""}
+              </View>
+           
+
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={pickImage1}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="collections"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={pickCamera1}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="photo-camera"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={uploadImage1}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="file-upload"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+          </View>
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+           <Text style={{marginTop:20}}>Remark : </Text>
           <TextInput
-            placeholder="Reamrk"
+          
+            placeholder="Remark"
             value={remark}
             onChangeText={(text) => {
               setRemark(text);
@@ -214,7 +526,7 @@ const TaskForm = () => {
           </Pressable>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -231,28 +543,28 @@ const Styles = StyleSheet.create({
     marginTop: 10,
   },
   textStyle: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     fontSize: 15,
     marginTop: 16,
     marginLeft: 35,
     marginRight: 35,
-    textAlign: 'center',
+    textAlign: "center",
   },
   buttonStyle: {
-    backgroundColor: '#307ecc',
+    backgroundColor: "#307ecc",
     borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#307ecc',
+    color: "#FFFFFF",
+    borderColor: "#307ecc",
     height: 40,
-    width:150,
-    alignItems: 'center',
+    width: 100,
+    alignItems: "center",
     borderRadius: 30,
-    marginLeft: 8,
+    marginLeft: 1,
     marginRight: 30,
     marginTop: 15,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     paddingVertical: 10,
     fontSize: 16,
   },
@@ -277,7 +589,7 @@ const Styles = StyleSheet.create({
     borderWidth: 0.19,
     paddingBottom: 55,
     borderRadius: 3,
-    marginTop: 20,
+    marginTop: 5,
     paddingLeft: 10,
   },
   inp1: {
@@ -297,7 +609,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   icon: {
-    marginRight: 5,
+    paddingTop: 5,
   },
   label: {
     position: "absolute",

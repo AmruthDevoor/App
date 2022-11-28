@@ -83,7 +83,8 @@ const handleNextPage = () => {
 
     
 }
-  
+const imageUrl =
+"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
 const viewItem = ({item}) => {
   return (
       <View >
@@ -110,7 +111,31 @@ const viewItem = ({item}) => {
      </Card.Content>
      <View style={{flexDirection:"row", marginLeft:220,marginTop:-130,marginBottom:10}}>
                                    <Card.Content >
-                 <Image source = {require("../../assets/noImage.jpg")} style={{width:130,height:130}} />
+                                   <View>
+                {/* <Image  /> */}
+                {item.picPath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+item.picPath}}
+                    
+                  />
+                )}
+              </View>
                  </Card.Content>
                 </View>
      
@@ -309,7 +334,7 @@ const styles = StyleSheet.create({
 
   footer: {
     position: "relative",
-    top: -465,
+    top: -475,
     paddingTop: height * -3,
   },
 });

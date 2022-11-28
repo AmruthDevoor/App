@@ -59,7 +59,7 @@ const MaterialStock = () => {
       </DataTable.Header>
      
           
-                     {material.map((mat)=>{
+                     {material.length <= 0 ? <Text>No Data Found</Text> : material.map((mat)=>{
             return(
              <DataTable.Row  >
         <DataTable.Cell>{mat.materialDto.materialName

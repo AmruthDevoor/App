@@ -24,8 +24,9 @@ import { Navigation } from "react-native-navigation";
   const ProReqAdd = () => {
     const navigation = useNavigation();
     const [value, setValue] = useState();
-  
-    const [selected, setSelected] = React.useState("");
+    const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
+
+    const [selected, setSelected] = React.useState({});
   
     const [isFocus, setIsFocus] = useState(false);
   
@@ -52,10 +53,13 @@ import { Navigation } from "react-native-navigation";
       });
       getReqAdd();
     }, [accessToken,techId,show]);
-  
-    const allProducts = product.map((p) => {
+    const productArray=[{id:0,name:"nothing to select"}]
+    const allProducts =product.length <= 0 ? productArray.map((p) =>{ return { key: p.id, value: p.name }}) : product.map((p) => {
       return { key: p.productId, value: p.productName };
     });
+    // const allProducts = product.map((p) => {
+    //   return { key: p.productId, value: p.productName };
+    // });
   
     const getReqAdd = () => {
       axios({
@@ -130,11 +134,13 @@ import { Navigation } from "react-native-navigation";
   
   <SafeAreaView>
           <SelectList
+            defaultOptions={defaultMaterial}
             setSelected={setSelected}
             data={allProducts}
             onSelect={() => alert(selected)}
             placeholder="Select A Product"
           />
+          <Text style={{marginTop:20}}>Quantity : </Text>
           <TextInput
             placeholder="Quantity"
           
@@ -146,7 +152,7 @@ import { Navigation } from "react-native-navigation";
             style={Styles.inp}
           
           />
-          
+          <Text style={{marginTop:20}}>Remark : </Text>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -192,14 +198,14 @@ import { Navigation } from "react-native-navigation";
       height: 50,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
+      marginTop: 5,
       paddingLeft: 10,
     },
     inp1: {
       height: 100,
       borderWidth: 0.19,
       borderRadius: 3,
-      marginTop: 20,
+      marginTop: 5,
       paddingLeft: 10,
       paddingBottom: 50,
     },

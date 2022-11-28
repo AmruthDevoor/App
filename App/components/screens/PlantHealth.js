@@ -21,11 +21,12 @@ import { useNavigation } from "@react-navigation/native";
 
 const PlantHealthTask = () => {
   const [techId, setTechId] = useState("");
+  const [planthealthtaskId, setPlanthealthtaskId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [plantTask, setPlantTask] = useState([]);
   const navigation = useNavigation();
   const onForm = (pid) => {
-   //console.warn(pid)
+   
     AsyncStorage.setItem ("planthealthtaskId",JSON.stringify(pid));
     navigation.navigate("PlantHealthForm");
   };
@@ -41,7 +42,7 @@ const PlantHealthTask = () => {
     });
 
     getPlantTaskData();
-  }, [accessToken]);
+  }, [accessToken,planthealthtaskId,plantTask]);
 
   const getPlantTaskData = () => {
     axios({
@@ -53,7 +54,7 @@ const PlantHealthTask = () => {
       },
     }).then((result) => {
       setPlantTask(result.data);
-      console.warn(result)
+   
     });
   };
   const showAlert = (text) =>{
@@ -67,11 +68,11 @@ const PlantHealthTask = () => {
     <ScrollView style={styles.main1} >
       <Text style={styles.head}>Plant Health</Text>
       <View>
-        {plantTask.map((plaTsk) => {
+        {plantTask.length <=0 ? <Text>No Data Found</Text> :plantTask.map((plaTsk) => {
           return (
             <TouchableOpacity  onPress={(e)=>{
               onForm(plaTsk.planthealthtaskId)
-              console.warn(plaTsk.planthealthtaskId)
+             
                           }}>
             <Card style={styles.card}>
               <View style={{flexDirection:"row" ,backgroundColor:"skyblue"}}>
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
   footer: {
     zindex: -1,
 
-    marginTop: -580,
+    marginTop: -590,
     position: "relative",
   },
   Content: {

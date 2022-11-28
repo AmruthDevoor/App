@@ -51,7 +51,7 @@ const ProductRequest = () => {
             <Text style={styles.text}>Installation</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={onProductUninstall} >
-            <Text style={styles.text}>Uninstallation</Text>
+            <Text style={styles.text}>Uninstall</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -59,7 +59,7 @@ const ProductRequest = () => {
             <Text style={styles.text}>Product Request</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} >
-            <Text style={styles.text}>Shifting</Text>
+            <Text style={styles.text}>Exchange</Text>
           </TouchableOpacity>
      
         </View>
@@ -77,7 +77,7 @@ export default ProductRequest;
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   footer: {
-    marginTop: -40,
+    marginTop: -55,
   },
   button: {
     backgroundColor: "#0073A9",

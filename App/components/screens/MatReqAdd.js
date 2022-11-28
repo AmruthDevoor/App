@@ -28,6 +28,7 @@ const MatReqAdd = () => {
 
   const [remark, setRemark] = useState("");
   const [isFocus, setIsFocus] = useState(false);
+  const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
 
   const [accessToken, setAccessToken] = useState("");
 
@@ -48,9 +49,14 @@ const MatReqAdd = () => {
     getReqAdd();
   }, [accessToken,techId,show]);
 
-  const allMaterials = material.map((m) => {
-    return { key: m.materialId, value: m.materialName };
+
+  const materialArray=[{id:0,name:"nothing to select"}]
+  const allMaterials =material.length <= 0 ? materialArray.map((m) =>{ return { key: m.id, value: m.name }}) : material.map((m) => {
+    return {key: m.materialId, value: m.materialName  };
   });
+  // const allMaterials = material.map((m) => {
+  //   return { key: m.materialId, value: m.materialName };
+  // });
 
   const getReqAdd = () => {
     axios({
@@ -62,6 +68,7 @@ const MatReqAdd = () => {
       },
     }).then((result) => {
       setMaterial(result.data);
+      console.warn(result.data)
     });
   };
  
@@ -123,11 +130,13 @@ const MatReqAdd = () => {
 
         <SafeAreaView>
           <SelectList
+            defaultOptions={defaultMaterial}
             setSelected={setSelected}
             data={allMaterials}
             onSelect={() => alert(selected)}
             placeholder="Select A Material"
           />
+          <Text style={{marginTop:20}}>Quantity : </Text>
           <TextInput
             placeholder="Quantity"
             value={totQuan}
@@ -138,7 +147,7 @@ const MatReqAdd = () => {
             
             style={Styles.inp}
           />
-         
+         <Text  style={{marginTop:20}}>Remark : </Text>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -194,14 +203,14 @@ const Styles = StyleSheet.create({
     height: 50,
     borderWidth: 0.19,
     borderRadius: 3,
-    marginTop: 20,
+    marginTop: 5,
     paddingLeft: 10,
   },
   inp1: {
     height: 100,
     borderWidth: 0.19,
     borderRadius: 3,
-    marginTop: 20,
+    marginTop: 5,
     paddingLeft: 10,
     paddingBottom: 50,
   },

@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
+  Alert,
   Dimensions,
   Image,
   StyleSheet,
@@ -86,12 +87,13 @@ const Login = ({ navigation }) => {
             
             navigation.replace("HomeScreen");
           }
+          else {Alert.alert("Bad Credentials")}
         })
         .catch((err) => {
     
         });
     } else {
-      alert(checkPassowrd);
+      console.warn("asdf")
     }
   };
 
