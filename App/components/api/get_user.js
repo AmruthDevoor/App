@@ -4,7 +4,7 @@ export const get_user = async (data) => {
    
   
     const res = {headers: {"Content-Type": "application/json",Authorization: accessToken}};
-  var result= fetch(`https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/login/login/v1/getTechnicianProfileByUserName/${userName}
+  var result= fetch(`wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/login/login/v1/getTechnicianProfileByUserName/${userName}
 `,
       res).then((response) => response.json())
       .then((data) => {console.warn(data)});

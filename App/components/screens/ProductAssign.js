@@ -24,6 +24,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
 
@@ -51,7 +52,7 @@ const ProductAssign = () => {
   const getProductAssign = () => {
     axios({
       method: "GET",
-      url:  `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productassign/v1/getAssignedProductsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url:  `${BaseUrl}/productassign/v1/getAssignedProductsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -103,7 +104,7 @@ const viewItem = ({item}) => {
      <Text style={styles.content}>Handover by : {item.handoverBy}</Text>
      </Card.Content>
      <Card.Content style={{ flexDirection: "row" }}>   
-     <Text style={styles.content}>Date : {moment ( item.insertedDate).format("L")}</Text>
+     <Text style={styles.content}>Date : {moment ( item.insertedDate).format("LL")}</Text>
      </Card.Content>
      <View style={{flexDirection:"row", marginLeft:200,marginTop:-140,marginBottom:15}}>
                                   <Card.Content >

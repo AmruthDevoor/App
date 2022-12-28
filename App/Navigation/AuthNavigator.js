@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { ViewComponent } from "react-native";
+import Alert from "../components/screens/Alert";
 import About from "../components/screens/About";
 import SettingScreen from "../components/screens/SettingScreen";
 import ForgetPassword from "../components/screens/ForgetPassword";
@@ -50,6 +51,7 @@ import PlantHealthClick from "../components/screens/PlanthHealthClick";
 import CollectionForm from "../components/screens/CollectionForm";
 import CollectionSide from "../components/screens/CollectionSide";
 import CollectionClick from "../components/screens/CollectionClick";
+import Alerts from "../components/screens/Alert";
 const sampleTabNavigation = createNativeStackNavigator();
 
 const AuthNavigator = () => {
@@ -74,6 +76,7 @@ const AuthNavigator = () => {
       <sampleTabNavigation.Screen name="Tasks" component={Tasks} />
       <sampleTabNavigation.Screen name="Collection" component={Collection} />
       <sampleTabNavigation.Screen name="Stock" component={Stock} />
+      <sampleTabNavigation.Screen name="Alerts" component={Alerts} />
       <sampleTabNavigation.Screen
         name="ProfileScreen"
         component={ProfileScreen}

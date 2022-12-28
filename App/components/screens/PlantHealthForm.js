@@ -12,6 +12,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -23,19 +24,22 @@ import axios from "axios";
 import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import BaseUrl from "../api/BaseUrl";
 
 const PlantHealthForm = () => {
   const [profileImage, setProfileImage] = useState("");
   const [profileImage1, setProfileImage1] = useState("");
   const [profileImage2, setProfileImage2] = useState("");
+  const [profileImage3, setProfileImage3] = useState("");
   const [filename, setFilename] = useState();
   const [filename1, setFilename1] = useState();
   const [filename2, setFilename2] = useState();
+  const [filename3, setFilename3] = useState();
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const[display,setDisplay]=useState()
   const[display1,setDisplay1]=useState()
-
+  const[display3,setDisplay3]=useState()
   const[display2,setDisplay2]=useState()
   const [show, setShow] = useState(false);
   const [accessToken, setAccessToken] = useState("");
@@ -70,6 +74,7 @@ const PlantHealthForm = () => {
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -95,7 +100,7 @@ const PlantHealthForm = () => {
     if (status === "granted") {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: true,quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -127,7 +132,7 @@ const PlantHealthForm = () => {
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
@@ -152,6 +157,7 @@ const PlantHealthForm = () => {
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn1 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -178,6 +184,7 @@ const PlantHealthForm = () => {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn1 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -209,7 +216,7 @@ const PlantHealthForm = () => {
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
@@ -234,6 +241,7 @@ const PlantHealthForm = () => {
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn2 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -260,6 +268,7 @@ const PlantHealthForm = () => {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn2 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -291,7 +300,7 @@ const PlantHealthForm = () => {
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
@@ -305,6 +314,90 @@ const PlantHealthForm = () => {
       console.warn(error.message);
     }
   };
+  const pickImage3 = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality:0.2,
+      });
+      var fn3 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn3);
+      setFilename3(fn3);
+
+      if (!response.cancelled) {
+        setProfileImage3(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickCamera3 = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality:0.2,
+      });
+      var fn3 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn3);
+      setFilename3(fn3);
+
+      if (!response.cancelled) {
+        setProfileImage3(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const uploadImage3 = async () => {
+    console.warn({
+      name: filename3,
+      uri: profileImage3,
+      type: "image/jpg",
+    });
+
+    const formData = new FormData();
+    formData.append("file", {
+      name: filename3,
+      uri: profileImage3,
+      type: "image/jpg",
+    });
+    try {
+      axios({
+        method: "POST",
+        url: `${BaseUrl}/file/uploadFile`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data; ",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((res) => {
+        setDisplay3(res.data.responseCode)
+        Alert.alert("TDS Image Uploaded Successfully")
+      });
+    } catch (error) {
+      console.warn(error.message);
+    }
+  };
   const onFromChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
 
@@ -313,11 +406,8 @@ const PlantHealthForm = () => {
     setDate(currentDate);
     let tempDate = new Date(currentDate);
     let fDate =
-      tempDate.getFullYear() +
-      "-" +
-      (tempDate.getMonth() + 1) +
-      "-" +
-      tempDate.getDate();
+      
+      tempDate.toLocaleDateString();
     setServiceDate(fDate);
   };
   const showMode = (currentMode) => {
@@ -341,7 +431,7 @@ const PlantHealthForm = () => {
   const getPlanthealthtaskId = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/getPlantHealthTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/planthealthtask/v1/getPlantHealthTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -350,9 +440,23 @@ const PlantHealthForm = () => {
   };
 
   const requestTask = (e) => {
-    if (spunJumboWound === "") {
+    if (serviceDate === "" ) {
+      Alert.alert("Please select service Date");
+    }
+    else if (plantClean === "Plant Clean" ) {
+      Alert.alert("Please select plant Clean");
+    }
+    else if (spun === "") {
+      Alert.alert("Please select spun ");
+      
+    } 
+    else if (spunJumboWound === "") {
       Alert.alert("Please enter spun jumbo wound quantity");
-    } else if (spunJumboPlain === "") {
+      
+    } 
+   
+   
+    else if (spunJumboPlain === "") {
       Alert.alert("Please enter spun jumbo plain quantity");
     } else if (spunSlimPlain === "") {
       Alert.alert("Please enter spun slim plain quantity");
@@ -374,7 +478,12 @@ const PlantHealthForm = () => {
     else if (display2 != "201") {
       Alert.alert("Please select Log pic");
     
-    } else {
+    } 
+    else if (display3 != "201") {
+      Alert.alert("Please select tds pic");
+    
+    }
+    else {
       e.preventDefault();
 
       let data = {
@@ -393,6 +502,7 @@ const PlantHealthForm = () => {
         spunJumboWound: spunJumboWound,
         spunSlimPlain: spunSlimPlain,
         spunSlimWound: spunSlimWound,
+        tdsImageName: filename3,
         status: status,
         technicianDto: {
           technicianId: techId,
@@ -401,14 +511,16 @@ const PlantHealthForm = () => {
 
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/postPlantHealthTask",
+        url: `${BaseUrl}/planthealthtask/v1/postPlantHealthTask`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
         },
         data: data,
-      }).then((res) => {
-        alert(res.data.message);
+      }).then((res) => {if(res.data.responseCode===201){
+        alert(res.data.message)}else if(res.data.responseCode===400){
+          alert(res.data.errorMessage)}
+       
         navigation.navigate("PlantTask");
       });
     }
@@ -425,7 +537,7 @@ const PlantHealthForm = () => {
         <View style={Styles.container}>
           <SafeAreaView>
             <View>
-              <Text style={{ fontSize: 15 }}>Service Date: {serviceDate}</Text>
+              <Text style={{ fontSize: 15 }}>Service Date: {moment(serviceDate).format("YYYY-MM-DD")}</Text>
 
               <View>
                 <Button title="Service Date" onPress={() => showMode("date")} />
@@ -442,6 +554,7 @@ const PlantHealthForm = () => {
                 />
               )}
             </View>
+          
 
             <Text></Text>
             <View style={{ flexDirection: "row" }}>
@@ -451,20 +564,32 @@ const PlantHealthForm = () => {
               <Picker
                 style={{
                   
-                  width: 100,
+                  width: 210,
                   height: 20,
                   borderWidth: 1,
-                  marginLeft:50,
+                  marginLeft:30,
                   paddingBottom: 20,
                   marginTop: -18,
                 }}
                 selectedValue={plantClean}
                 onValueChange={(itemValue) => setPlantClean(itemValue)}
-              >
+                 >
+                   <Picker.Item label="select the PlantClean" value="select" />
                 <Picker.Item label="yes" value="yes" />
                 <Picker.Item label="no" value="no" />
+                 
               </Picker>
+             
             </View>
+           
+           <TextInput
+              placeholder="plantClean"
+              keyboardType="numeric"
+              value={plantClean}
+            
+              style={Styles.clean}
+            />
+           
             <Text>Plant Image Name : </Text>
             <View style={{ flexDirection: "row" }}>
             <Text style={{ borderWidth: 1, padding: 5, marginTop: 5,width:330 }}> {filename}
@@ -526,24 +651,38 @@ const PlantHealthForm = () => {
                 style={{ width: 200, height: 200 }}
               />
             )}
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
+           <View style={{ flexDirection: "row" }}>
               <Text style={{fontWeight:"bold",fontSize:15}}>Spun : </Text>
+             
+              
               <Picker
                 style={{
-                  width: 100,
+                  
+                  width: 180,
                   height: 20,
                   borderWidth: 1,
+                  marginLeft:30,
                   paddingBottom: 20,
-                  marginLeft:80,
                   marginTop: -18,
                 }}
                 selectedValue={spun}
                 onValueChange={(itemValue) => setSpun(itemValue)}
-              >
+                 >
+                   <Picker.Item label="select the Spun"  />
                 <Picker.Item label="washed" value="washed" />
-                <Picker.Item label="not Washed" value="not Washed" />
+                <Picker.Item label="notWashed" value="notWashed" />
+                 
               </Picker>
+             
             </View>
+           
+           <TextInput
+              placeholder="spun"
+              keyboardType="numeric"
+              value={spun}
+            
+              style={Styles.clean}
+            />
             <Text>Spun Jumbo Wound : </Text>
             <TextInput
               placeholder="Spun Jumbo Wound"
@@ -644,24 +783,38 @@ const PlantHealthForm = () => {
                 style={{ width: 200, height: 200 }}
               />
             )}
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <Text style={{fontWeight:"bold",fontSize:15}}>Log Entry : </Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={{fontWeight:"bold",fontSize:15}}>Log Entry : </Text>
+             
+              
               <Picker
                 style={{
-                  width: 100,
+                  
+                  width: 200,
                   height: 20,
                   borderWidth: 1,
-                  marginLeft:80,
+                  marginLeft:30,
                   paddingBottom: 20,
                   marginTop: -18,
                 }}
                 selectedValue={logEntry}
                 onValueChange={(itemValue) => setLogEntry(itemValue)}
-              >
+                 >
+                   <Picker.Item label="select the Log Entry"  />
                 <Picker.Item label="yes" value="yes" />
                 <Picker.Item label="no" value="no" />
+                 
               </Picker>
+             
             </View>
+           
+           <TextInput
+              placeholder="Log Entry"
+              keyboardType="numeric"
+              value={logEntry}
+            
+              style={Styles.clean}
+            />
             <Text>Log Image Name : </Text>
             <View style={{ flexDirection: "row" }}>
             <Text style={{ borderWidth: 1, padding: 5, marginTop: 8,width:330 }}>{filename2}
@@ -720,6 +873,59 @@ const PlantHealthForm = () => {
                 style={{ width: 200, height: 200 }}
               />
             )}
+             <Text>TDS : </Text>
+            <View style={{ flexDirection: "row" }}>
+            <Text style={{ borderWidth: 1, padding: 5, marginTop: 8,width:330 }}>{filename3}
+            </Text>
+            {display3=="201"?
+              <Text>
+              <MaterialIcons
+                  style={Styles.icon}
+                  name="done"
+                  size={30}
+                  color="green"
+                />
+              </Text>: ""}
+              </View>
+            
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={pickImage3}
+                style={Styles.buttonStyle}
+                activeOpacity={0.5}
+              >
+                <MaterialIcons
+                  style={Styles.icon}
+                  name="collections"
+                  size={30}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={pickCamera3}
+                style={Styles.buttonStyle}
+                activeOpacity={0.5}
+              >
+                <MaterialIcons
+                  style={Styles.icon}
+                  name="photo-camera"
+                  size={30}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={uploadImage3}
+                style={Styles.buttonStyle}
+                activeOpacity={0.5}
+              >
+                <MaterialIcons
+                  style={Styles.icon}
+                  name="file-upload"
+                  size={30}
+                  color="white"
+                />
+              </TouchableOpacity>
+            </View>
             <Text>Remark : </Text>
             <TextInput
               placeholder="Remark"
@@ -778,7 +984,7 @@ const Styles = StyleSheet.create({
     marginLeft: 1,
     marginRight: 30,
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   buttonTextStyle: {
     color: "#FFFFFF",
@@ -815,6 +1021,15 @@ const Styles = StyleSheet.create({
 
     borderRadius: 3,
     marginTop: 0,
+    marginBottom: 20,
+    paddingLeft: 10,
+  },
+  clean: {
+    height: 40,
+    borderWidth: 0.19,
+
+    borderRadius: 3,
+    marginTop: -10,
     marginBottom: 20,
     paddingLeft: 10,
   },

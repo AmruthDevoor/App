@@ -10,6 +10,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -25,6 +26,7 @@ import axios from "axios";
 import { useRef } from "react";
 import { Button } from "react-native-paper";
 import { Image } from "react-native";
+import BaseUrl from "../api/BaseUrl";
 const options = {
   title: "Select Image",
   type: "library",
@@ -43,7 +45,7 @@ const MatInstReq = () => {
   const [showw, setShoww] = useState(false);
   const [profileImage, setProfileImage] = useState(false);
   const [value, setValue] = useState();
-  const[display,setDisplay]=useState()
+  const [display, setDisplay] = useState();
 
   const [fileData, setFileData] = useState();
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -59,7 +61,10 @@ const MatInstReq = () => {
   const [plant, setPlant] = useState([]);
   const [material, setMaterial] = useState([]);
   const [materialId, setMaterialId] = useState();
-const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
+  const [defaultMaterial, setDefaultMaterial] = useState({
+    key: 0,
+    value: "select",
+  });
   const [totQuan, setQuantity] = useState();
   const [productSerialNo, setProductSerialNo] = useState();
   const [plantId, setPlantId] = useState("");
@@ -67,6 +72,7 @@ const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
   const [show, setShow] = useState("");
   const [filename, setFilename] = useState();
   const [materialName, setMaterialName] = useState("");
+  const [plantName, setPlantName] = useState("");
   const [installationDate, setInstallationDate] = useState("");
   const [remark, setRemark] = useState("");
   const [techId, setTechId] = useState();
@@ -77,12 +83,8 @@ const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
     setShoww(false);
     setDate(currentDate);
     let tempDate = new Date(currentDate);
-    let fDate =
-      tempDate.getFullYear() +
-      "-" +
-      (tempDate.getMonth() + 1) +
-      "-" +
-      tempDate.getDate();
+    let fDate = tempDate.toLocaleDateString();
+
     setInstallationDate(fDate);
   };
   const showMode = (currentMode) => {
@@ -102,7 +104,7 @@ const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
 
     console.log("reached here" + JSON.stringify(formdata));
     let res = await fetch(
-      "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+      "https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/uploadFile",
       {
         method: "post",
         body: formdata,
@@ -126,21 +128,31 @@ const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
     getAllPlants();
     getAllMaterials();
   }, [accessToken, techId, show]);
-const plantArray=[{id:0,name:"nothing to select"}]
-  const AllPlants =plant.length <= 0 ?plantArray.map((p) =>{ return { key: p.id, value: p.name }}) : plant.map((p) => {
-    return { key: p.plantId, value: p.plantName };
-  });
-  const materialArray=[{id:0,name:"Nothing to select"}]
-  const AssignedMaterial =material.length <=0 ? materialArray.map((ap) =>{ return { key: ap.id, value: ap.name }}) : material.map((ap) => {
-    return {
-      key: ap.materialId,
-      value: ap.materialName === null ? "no name" : ap.materialName,
-    };
-  });
+  const plantArray = [{ id: 0, name: "nothing to select" }];
+  const AllPlants =
+    plant.length <= 0
+      ? plantArray.map((p) => {
+          return { key: p.id, value: p.name };
+        })
+      : plant.map((p) => {
+          return { key: p.plantId, value: p.plantName };
+        });
+  const materialArray = [{ id: 0, name: "Nothing to select" }];
+  const AssignedMaterial =
+    material.length <= 0
+      ? materialArray.map((ap) => {
+          return { key: ap.id, value: ap.name };
+        })
+      : material.map((ap) => {
+          return {
+            key: ap.materialId,
+            value: ap.materialName === null ? "no name" : ap.materialName,
+          };
+        });
   const getAllPlants = () => {
     axios({
       method: "GET",
-      url: ` https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/plant/v1/getAllPlants`,
+      url: `${BaseUrl}/plant/v1/getAllPlants`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -150,11 +162,23 @@ const plantArray=[{id:0,name:"nothing to select"}]
       setPlantId(result.data);
     });
   };
+  const getAPlant = (id) => {
+    axios({
+      method: "GET",
+      url: ` ${BaseUrl}/plant/v1/getPlantByPlantId/{plantId}?plantId=${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((result) => {
+      setPlantName(result.data.plantName);
+    });
+  };
 
   const getAllMaterials = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/material/v1/getAllMaterials`,
+      url: `${BaseUrl}/material/v1/getAllMaterials`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -163,10 +187,10 @@ const plantArray=[{id:0,name:"nothing to select"}]
       setMaterial(result.data);
     });
   };
-  const getByProductHandoverId = () => {
+  const getAMaterial = (id) => {
     axios({
       method: "GET",
-      url: ` https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/material/v1/getMaterialByMaterialId/{materialId}?materialId=${proSelected}`,
+      url: ` ${BaseUrl}/material/v1/getMaterialByMaterialId/{materialId}?materialId=${id}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -188,16 +212,19 @@ const plantArray=[{id:0,name:"nothing to select"}]
   };
 
   const requestProduct = (e) => {
-    if (totQuan === "") {
+    if (totQuan === "" || totQuan == null) {
       Alert.alert("Please enter the quantity");
-    } else if (totQuan == 0) {
-      Alert.alert("Quantity cannot be 0");
+    } else if (materialName === "") {
+      Alert.alert("please select the material");
+    } else if (installationDate === "") {
+      Alert.alert("please select the date");
+    }
+    else if (plantName === "") {
+      Alert.alert("please select the plant");
     } else if (remark === "") Alert.alert("Please enter the remark");
     else if (display != "201") {
       Alert.alert("Please select pic");
-    
-    }
-    else {
+    } else {
       e.preventDefault();
 
       let data = {
@@ -209,6 +236,7 @@ const plantArray=[{id:0,name:"nothing to select"}]
         plantDto: {
           plantId: selected,
         },
+       
         quantity: totQuan,
         remark: remark,
         picName: filename,
@@ -219,7 +247,7 @@ const plantArray=[{id:0,name:"nothing to select"}]
 
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materiallog/v1/installMaterial",
+        url: `${BaseUrl}/materiallog/v1/installMaterial`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -227,7 +255,11 @@ const plantArray=[{id:0,name:"nothing to select"}]
         data: data,
       })
         .then((res) => {
-          alert(res.data.message);
+          if (res.data.responseCode === 201) {
+            alert(res.data.message);
+          } else if (res.data.responseCode === 400) {
+            alert(res.data.errorMessage);
+          }
         })
         .then(() => {
           navigation.navigate("MaterialInstallation");
@@ -273,6 +305,7 @@ const plantArray=[{id:0,name:"nothing to select"}]
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -299,6 +332,7 @@ const plantArray=[{id:0,name:"nothing to select"}]
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -330,15 +364,15 @@ const plantArray=[{id:0,name:"nothing to select"}]
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
           Authorization: "Bearer " + accessToken,
         },
       }).then((res) => {
-        setDisplay(res.data.responseCode)
-        Alert.alert("Image Uploaded Successfully")
+        setDisplay(res.data.responseCode);
+        Alert.alert("Image Uploaded Successfully");
       });
     } catch (error) {
       console.warn(error.message);
@@ -356,13 +390,24 @@ const plantArray=[{id:0,name:"nothing to select"}]
 
         <SafeAreaView>
           <SelectList
-          defaultOptions={defaultMaterial}
+            defaultOptions={defaultMaterial}
             setSelected={setProSelected}
             data={AssignedMaterial}
-            onSelect={() => alert(proSelected)}
+            onSelect={() => getAMaterial(proSelected)}
             placeholder="Select A Material"
           />
-<Text style={{marginTop:10}}>Quantity : </Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ marginTop: 4 }}>
+              Material Name : {materialName}{" "}
+            </Text>
+            {/* <TextInput
+              placeholder="material Name"
+              value={materialName}
+             
+            
+            /> */}
+          </View>
+          <Text style={{ marginTop: 10 }}>Quantity : </Text>
           <TextInput
             placeholder="Quantity"
             value={totQuan}
@@ -374,8 +419,15 @@ const plantArray=[{id:0,name:"nothing to select"}]
           />
 
           <View>
-            <Text style={{ fontSize: 15, paddingTop: 10,marginBottom:10,marginTop:-10 }}>
-              Installation Date: {installationDate}
+            <Text
+              style={{
+                fontSize: 15,
+                paddingTop: 10,
+                marginBottom: 10,
+                marginTop: -10,
+              }}
+            >
+              Installation Date: {moment(installationDate).format("YYYY-MM-DD")}
             </Text>
             <View>
               <TouchableOpacity>
@@ -396,10 +448,11 @@ const plantArray=[{id:0,name:"nothing to select"}]
                 <SelectList
                   setSelected={setSelected}
                   data={AllPlants}
-                  onSelect={() => alert(selected)}
+                  onSelect={() => getAPlant(selected)}
                   placeholder="Select A Plant"
                   style={{ marginTop: 10 }}
                 />
+                <Text>plantName:{plantName}</Text>
               </TouchableOpacity>
             </View>
             {showw && (
@@ -413,66 +466,72 @@ const plantArray=[{id:0,name:"nothing to select"}]
               />
             )}
           </View>
-          
 
-          <Text style={{marginTop:15}}>FileName : </Text>
+          <Text style={{ marginTop: 15 }}>FileName : </Text>
           <View style={{ flexDirection: "row" }}>
-          <Text
-             
-             style={{ borderWidth: 0.5,borderRadius:5, padding: 10 ,width:330}}>
-               
-             {filename}
-             </Text>
-             {display=="201"?
+            <Text
+              style={{
+                borderWidth: 0.5,
+                borderRadius: 5,
+                padding: 10,
+                width: 330,
+              }}
+            >
+              {filename}
+            </Text>
+            {display == "201" ? (
               <Text>
-              <MaterialIcons
+                <MaterialIcons
                   style={Styles.icon}
                   name="done"
                   size={30}
                   color="green"
                 />
-              </Text>: ""}
-              </View>
-           <View style={{ flexDirection: "row" }}>
-             <TouchableOpacity
-               onPress={pickImage}
-               style={Styles.buttonStyle}
-               activeOpacity={0.5}
-             >
-               <MaterialIcons
-                 style={Styles.icon}
-                 name="collections"
-                 size={30}
-                 color="white"
-               />
-             </TouchableOpacity>
-             <TouchableOpacity
-               onPress={pickCamera}
-               style={Styles.buttonStyle}
-               activeOpacity={0.5}
-             >
-               <MaterialIcons
-                 style={Styles.icon}
-                 name="photo-camera"
-                 size={30}
-                 color="white"
-               />
-             </TouchableOpacity>
+              </Text>
+            ) : (
+              ""
+            )}
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={pickImage}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="collections"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={pickCamera}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="photo-camera"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
 
-             <TouchableOpacity
-               onPress={uploadImage}
-               style={Styles.buttonStyle}
-               activeOpacity={0.5}
-             >
-               <MaterialIcons
-                 style={Styles.icon}
-                 name="file-upload"
-                 size={30}
-                 color="white"
-               />
-             </TouchableOpacity>
-           </View>
-          <Text style={{marginTop:20}}>Remark : </Text>
+            <TouchableOpacity
+              onPress={uploadImage}
+              style={Styles.buttonStyle}
+              activeOpacity={0.5}
+            >
+              <MaterialIcons
+                style={Styles.icon}
+                name="file-upload"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={{ marginTop: 20 }}>Remark : </Text>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
@@ -583,7 +642,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   icon: {
-   paddingTop: 5,
+    paddingTop: 5,
   },
   label: {
     position: "absolute",

@@ -21,6 +21,7 @@ import {
   import axios from "axios";
   import { Card } from "react-native-paper";
   import moment from "moment";
+import BaseUrl from "../api/BaseUrl";
   
   const PlantHealthClick = () => {
     const [accessToken, setAccessToken] = useState("");
@@ -29,6 +30,7 @@ import {
     const [techId, setTechId] = useState("");
     const [spunImageName,setSpunImageName]=useState("")
   const [spunImagePath,setSpunImagePath]=useState("")
+  const [tdsImagePath,setTdsImagePath]=useState("")
   const [plantImagePath,setPlantImagePath]=useState("")
   const [logImagePath,setLogImagePath]=useState("")
 
@@ -69,7 +71,7 @@ import {
     const getPlanthealthtaskId = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/getAllPlantHealthTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
+        url: `${BaseUrl}/planthealthtask/v1/getAllPlantHealthTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -79,7 +81,7 @@ import {
     const getServicePlantTask = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/getPlantHealthTaskLogByPlanthealthtaskId/{planthealthtaskId}?planthealthtaskId=${planthealthtaskId}`,
+        url: `${BaseUrl}/planthealthtask/v1/getPlantHealthTaskLogByPlanthealthtaskId/{planthealthtaskId}?planthealthtaskId=${planthealthtaskId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -88,7 +90,7 @@ import {
         console.warn(result)
         var taskPlantData = result.data;
        
-        setServiceDate(moment(taskPlantData.serviceDate).format("L"))
+        setServiceDate(moment(taskPlantData.serviceDate).format("LL"))
         setRemark(taskPlantData.remark)
         setSpun(taskPlantData.spun)
         setSpunJumboWound(taskPlantData.spunJumboWound)
@@ -101,14 +103,15 @@ import {
         setPlantImagePath(taskPlantData.plantImagePath)
         setLogImagePath(taskPlantData.logImagePath)
         setPlantClean(taskPlantData.plantClean)
+        setTdsImagePath(taskPlantData.tdsImagePath)
 
-        setInsertedDate(moment(taskPlantData.insertedDate).format("L"))
+        setInsertedDate(moment(taskPlantData.insertedDate).format("LL"))
       
       });
      
     };
     const imageUrl =
-    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
+    "https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/downloadFile/?filePath=";
     return (
       <View>
         <Header />
@@ -211,9 +214,37 @@ import {
                 )}
               </View>
         </View>
+        <View>
+          <Text style={Styles.text}>tdsImage : </Text>
+          <View>
+                {/* <Image  /> */}
+                {tdsImagePath === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+tdsImagePath}}
+                    
+                  />
+                )}
+              </View>
+        </View>
         <Text></Text>
        
-        <Text style={Styles.text}>InsertedDate: {insertedDate}</Text>
+        <Text style={Styles.text}>InsertedDate: {moment(insertedDate).format("LL")}</Text>
         
         </View>
         </Card>

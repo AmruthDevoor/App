@@ -18,6 +18,7 @@ import {
 import { Card, Paragraph } from "react-native-paper";
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native'
+import BaseUrl from '../api/BaseUrl'
 
 const Tasks = () => {
 
@@ -49,7 +50,7 @@ const navigation = useNavigation();
   const getTaskData = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/task/v1/getTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken},
@@ -98,21 +99,29 @@ onForm(tsk.taskId)
               <Card.Content style={{paddingTop:20}} >
                 <Text>Ticket .No: {tsk.taskTicketNumber}</Text>
                </Card.Content>
-               <Card.Content style={{flexDirection:"row",paddingTop:10}} > 
+               <Card.Content style={{paddingTop:10}} > 
                 <View >
                 <Text >
-                  Assigned Date: {moment(tsk.assigningDate).format("L")}
+                  Assigned Date: {moment(tsk.assigningDate).format("LL")}
                 </Text  >
                 </View>
                 <View >
-                <Text style={{paddingLeft:30}}>DeadLine: {moment(tsk.deadlineDate).format("L")}</Text>
+                <Text style={{paddingLeft:30}}>DeadLine: {moment(tsk.deadlineDate).format("LL")}</Text>
                 </View>
               </Card.Content>
             </Card>
             </TouchableOpacity>
           );
         })}
-
+ <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
       
       </View>
     </ScrollView>

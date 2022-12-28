@@ -49,7 +49,7 @@ const Material = () => {
           <TouchableOpacity style={styles.button} onPress={onMaterialInstall} >
             <Text style={styles.text}>Installation</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}  onPress={onMaterialUninstall}>
+          <TouchableOpacity style={styles.button}  >
             <Text style={styles.text}>Exchange</Text>
           </TouchableOpacity>
         </View>
@@ -76,7 +76,7 @@ export default Material;
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   footer: {
-    marginTop: -55,
+    marginTop: -60,
   },
   button: {
     backgroundColor: "#0073A9",

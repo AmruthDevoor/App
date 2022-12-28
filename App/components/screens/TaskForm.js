@@ -13,6 +13,7 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -22,6 +23,7 @@ import Header from "../AppHeader";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import BaseUrl from "../api/BaseUrl";
 const TaskForm = () => {
   const [profileImage, setProfileImage] = useState("");
   const [profileImage1, setProfileImage1] = useState("");
@@ -30,8 +32,8 @@ const TaskForm = () => {
   const [filename1, setFilename1] = useState();
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
-  const[display,setDisplay]=useState()
-  const[display1,setDisplay1]=useState()
+  const [display, setDisplay] = useState();
+  const [display1, setDisplay1] = useState();
   const [show, setShow] = useState(false);
   const [showw, setShoww] = useState(false);
   const [accessToken, setAccessToken] = useState("");
@@ -52,12 +54,7 @@ const TaskForm = () => {
     setShow(false);
     setDate(currentDate);
     let tempDate = new Date(currentDate);
-    let fDate =
-      tempDate.getFullYear() +
-      "-" +
-      (tempDate.getMonth() + 1) +
-      "-" +
-      tempDate.getDate();
+    let fDate = tempDate.toLocaleDateString();
     setServiceDate(fDate);
   };
   const showMode = (currentMode) => {
@@ -81,7 +78,7 @@ const TaskForm = () => {
   const getTaskId = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/task/v1/getTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -92,18 +89,16 @@ const TaskForm = () => {
   };
 
   const requestTask = (e) => {
-    if (remark === "") {
-      Alert.alert("Please enter te remark");
-    } 
-    else if (display != "201") {
+  if (serviceDate === ""){
+    Alert.alert("Please enter the service Date");
+  }
+    else if (remark === "") {
+      Alert.alert("Please enter the remark");
+    } else if (display != "201") {
       Alert.alert("Please select old pic");
-    
-    }
-    else if (display1 != "201") {
+    } else if (display1 != "201") {
       Alert.alert("Please select new pic");
-    
-    }
-     else {
+    } else {
       e.preventDefault();
 
       let data = {
@@ -123,14 +118,18 @@ const TaskForm = () => {
       console.warn(data);
       axios({
         method: "POST",
-        url: " https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/postServiceTask",
+        url: ` ${BaseUrl}/task/v1/postServiceTask`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
         },
         data: data,
       }).then((res) => {
-        alert(res.data.message);
+        if (res.data.responseCode === 201) {
+          alert(res.data.message);
+        } else if (res.data.responseCode === 400) {
+          alert(res.data.errorMessage);
+        }
         navigation.navigate("Tasks");
       });
     }
@@ -168,6 +167,7 @@ const TaskForm = () => {
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -194,6 +194,7 @@ const TaskForm = () => {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -219,7 +220,7 @@ const TaskForm = () => {
     if (status === "granted") {
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: true,quality:0.2,
       });
       var fn1 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -245,7 +246,7 @@ const TaskForm = () => {
     if (status === "granted") {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: true,quality:0.2,
       });
       var fn1 = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -277,15 +278,15 @@ const TaskForm = () => {
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
           Authorization: "Bearer " + accessToken,
         },
       }).then((res) => {
-        setDisplay(res.data.responseCode)
-        Alert.alert("Old Image Updated Successfully")
+        setDisplay(res.data.responseCode);
+        Alert.alert("Old Image Updated Successfully");
       });
     } catch (error) {
       console.warn(error.message);
@@ -307,15 +308,15 @@ const TaskForm = () => {
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
           Authorization: "Bearer " + accessToken,
         },
       }).then((res) => {
-        setDisplay1(res.data.responseCode)
-        Alert.alert("New Image Updated Successfully")
+        setDisplay1(res.data.responseCode);
+        Alert.alert("New Image Updated Successfully");
       });
     } catch (error) {
       console.warn(error.message);
@@ -359,7 +360,9 @@ const TaskForm = () => {
       <View style={Styles.container}>
         <SafeAreaView>
           <View>
-            <Text style={{ fontSize: 15 }}>Service Date: {serviceDate}</Text>
+            <Text style={{ fontSize: 15 }}>
+              Service Date: {moment(serviceDate).format("YYYY-MM-DD")}
+            </Text>
             <View>
               <Button title="Service Date" onPress={() => showMode("date")} />
             </View>
@@ -376,23 +379,26 @@ const TaskForm = () => {
           </View>
 
           <Text></Text>
-          
+
           <Text>Old File Name : </Text>
           <View style={{ flexDirection: "row" }}>
-          <Text style={{ borderWidth: 1, padding:5,width:330}}>
-          {filename}
-          </Text>
-          {display=="201"?
+            <Text style={{ borderWidth: 1, padding: 5, width: 330 }}>
+              {filename}
+            </Text>
+            {display == "201" ? (
               <Text>
-              <MaterialIcons
+                <MaterialIcons
                   style={Styles.icon}
                   name="done"
                   size={30}
                   color="green"
                 />
-              </Text>: ""}
-            </View>
-            
+              </Text>
+            ) : (
+              ""
+            )}
+          </View>
+
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
               onPress={pickImage}
@@ -438,26 +444,26 @@ const TaskForm = () => {
               style={{ width: 200, height: 200 }}
             />
           )}
-           <Text style={{marginTop:10}}>
-             New File Name : 
-           </Text>
-           <View style={{ flexDirection: "row" }}>
-        
-            
-          <Text style={{ borderWidth: 1, padding: 5, marginTop: 1,width:330}}>
-          {filename1}
-          </Text>
-          {display1=="201"?
+          <Text style={{ marginTop: 10 }}>New File Name :</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text
+              style={{ borderWidth: 1, padding: 5, marginTop: 1, width: 330 }}
+            >
+              {filename1}
+            </Text>
+            {display1 == "201" ? (
               <Text>
-              <MaterialIcons
+                <MaterialIcons
                   style={Styles.icon}
                   name="done"
                   size={30}
                   color="green"
                 />
-              </Text>: ""}
-              </View>
-           
+              </Text>
+            ) : (
+              ""
+            )}
+          </View>
 
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
@@ -504,9 +510,8 @@ const TaskForm = () => {
               style={{ width: 200, height: 200 }}
             />
           )}
-           <Text style={{marginTop:20}}>Remark : </Text>
+          <Text style={{ marginTop: 20 }}>Remark : </Text>
           <TextInput
-          
             placeholder="Remark"
             value={remark}
             onChangeText={(text) => {

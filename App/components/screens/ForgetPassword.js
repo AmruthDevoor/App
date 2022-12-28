@@ -36,8 +36,7 @@ const ForgetPassword = () => {
       <FormNavigator
         onLeftLinkPress={navigateToLogin(navigation)}
         leftLinkText="LogIn"
-        onRightLinkPress={navigateToSignUp(navigation)}
-        rightLinkText="Sign Up"
+       
       />
     </FormContainer>
   );

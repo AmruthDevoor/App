@@ -18,6 +18,7 @@ import {
 import { Card, Paragraph } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 
 const PlantHealthTask = () => {
   const [techId, setTechId] = useState("");
@@ -47,7 +48,7 @@ const PlantHealthTask = () => {
   const getPlantTaskData = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/getPlantHealthTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/planthealthtask/v1/getPlantHealthTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -99,18 +100,20 @@ const PlantHealthTask = () => {
               <Card.Content style={{paddingTop:20}} >
                 <Text>Ticket .No: {plaTsk.planthealthtaskTicketNumber}</Text>
                </Card.Content>
-               <Card.Content style={{flexDirection:"row",paddingTop:10}} > 
+               <Card.Content style={{paddingTop:10}} > 
                 <View >
                 <Text >
-                  Assigned Date: {moment(plaTsk.assigningDate).format("L")}
+                  Assigned Date: {moment(plaTsk.assigningDate).format("LL")}
                 </Text  >
                 </View>
                 <View >
-                <Text style={{paddingLeft:30}}>DeadLine: {moment(plaTsk.deadlineDate).format("L")}</Text>
+                <Text >DeadLine: {moment(plaTsk.deadlineDate).format("LL")}</Text>
                 </View>
               </Card.Content>
             </Card>
+            
             </TouchableOpacity>
+       
           );
         })}
 
@@ -135,6 +138,16 @@ style={{
       </Card.Content>
     </Card>
      */}
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
       </View>
     </ScrollView>
     <View style={styles.footer}>

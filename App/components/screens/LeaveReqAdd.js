@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
+import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -21,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../AppHeader";
 import axios from "axios";
 import { useRef } from "react";
+import BaseUrl from "../api/BaseUrl";
 
 const LeaveReqAdd = () => {
   const [selected, setSelected] = React.useState("");
@@ -42,7 +44,7 @@ const LeaveReqAdd = () => {
   const [header, setHeader] = useState("");
   const [leaveDays, setLeaveDays] = useState("");
   const [toDate, setToDate] = useState("");
-  const[show,setShow] = useState("")
+  const [show, setShow] = useState("");
   const onFromChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
 
@@ -52,12 +54,7 @@ const LeaveReqAdd = () => {
     let tempDate = new Date(currentDate);
     let fDate =
       
-      tempDate.getFullYear()
-       +
-      "-" +
-      (tempDate.getMonth() + 1) +
-      "-" +
-      tempDate.getDate();
+      tempDate.toLocaleDateString();
     setFromDate(fDate);
   };
   const showFromMode = (currentMode) => {
@@ -73,12 +70,8 @@ const LeaveReqAdd = () => {
     setDate(currentDate);
     let tempDate = new Date(currentDate);
     let tDate =
-    tempDate.getFullYear()
-    +
-   "-" +
-   (tempDate.getMonth() + 1) +
-   "-" +
-   tempDate.getDate();
+      
+      tempDate.toLocaleDateString();
     setToDate(tDate);
   };
   const showToMode = (currentMode) => {
@@ -94,12 +87,12 @@ const LeaveReqAdd = () => {
       setTechId(value);
     });
     getLeaveAdd();
-  }, [accessToken,techId,show]);
+  }, [accessToken, techId, show]);
 
   const getLeaveAdd = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/leave/v1/requestLeave`,
+      url: `https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/leave/v1/requestLeave`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -110,46 +103,53 @@ const LeaveReqAdd = () => {
   };
 
   const requestLeave = (e) => {
-    if(header===""){
-      Alert.alert("Please enter the Header")}
-    else if(leaveDays===""){
-        Alert.alert("Please enter the leave days")
-      }
-      else if(leaveDays==0){
-        Alert.alert("Leave Days cannot be 0")
-      }
-      else if(description==="")
-      Alert.alert("Please enter the description")
-      else{
-    e.preventDefault();
+    if (header === "") {
+      Alert.alert("Please enter the Header");
+    }else if (fromDate === "") {
+      Alert.alert("Please enter the from Date");
+    }else if (toDate === "") {
+      Alert.alert("Please enter the to date");
+    } else if (leaveDays === "") {
+      Alert.alert("Please enter the leave days");
+    } else if (leaveDays == 0) {
+      Alert.alert("Leave Days cannot be 0");
+    } else if (description === "") Alert.alert("Please enter the description");
+    else {
+      e.preventDefault();
 
-    let data = {
-        "description": description,
-       
-        "fromDate": fromDate,
-        "header": header,
-      
-        "leaveDays": Number(leaveDays),
-        
-      
-        "technicianDto": {
-       
-          "technicianId": techId
+      let data = {
+        description: description,
+
+        fromDate: fromDate,
+        header: header,
+
+        leaveDays: Number(leaveDays),
+
+        technicianDto: {
+          technicianId: techId,
         },
-       
-        "toDate": toDate
-      }
-  
-    axios({
-      method: "POST",
-      url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/leave/v1/requestLeave",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-      data: data,
-    }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("Leave")});
-  }
+
+        toDate: toDate,
+      };
+
+      axios({
+        method: "POST",
+        url: `${BaseUrl}/leave/v1/requestLeave`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+        data: data,
+      })
+        .then((res) => {
+          if(res.data.responseCode===201){
+            alert(res.data.message)}else if(res.data.responseCode===400){
+              alert(res.data.errorMessage)}
+        })
+        .then(() => {
+          navigation.navigate("Leave");
+        });
+    }
   };
   return (
     <View>
@@ -159,7 +159,7 @@ const LeaveReqAdd = () => {
       </Text>
       <View style={Styles.container}>
         <SafeAreaView>
-        <TextInput
+          <TextInput
             placeholder="Header"
             value={header}
             onChangeText={(text) => {
@@ -169,9 +169,7 @@ const LeaveReqAdd = () => {
           />
           <Text></Text>
           <View>
-            <Text style={{  fontSize: 15 }}>
-              From Date: {fromDate}
-            </Text>
+            <Text style={{ fontSize: 15 }}>From Date: {moment(fromDate).format("YYYY-MM-DD")}</Text>
             <View>
               <Button title="From Date" onPress={() => showFromMode("date")} />
             </View>
@@ -188,9 +186,7 @@ const LeaveReqAdd = () => {
           </View>
           <Text></Text>
           <View>
-            <Text style={{fontSize: 15}}>
-              To Date: {toDate}
-            </Text>
+            <Text style={{ fontSize: 15 }}>To Date: {moment(toDate).format("YYYY-MM-DD")}</Text>
             <View>
               <Button title="To Date" onPress={() => showToMode("date")} />
             </View>
@@ -205,10 +201,7 @@ const LeaveReqAdd = () => {
               />
             )}
           </View>
-          
 
-          
-          
           <TextInput
             placeholder="No of Leave Days"
             value={leaveDays}

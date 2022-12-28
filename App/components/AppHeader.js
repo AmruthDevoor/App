@@ -37,7 +37,7 @@ const Header = ({
       <View style={[styles.view, styles.rightView]}>
        
           <TouchableOpacity>
-             <MaterialIcons name="notifications" size={30} color="#0073A9" onPress={onNoti}  />
+             <MaterialIcons name="notifications" size={30} color="#0073A9"   />
           </TouchableOpacity>
        
         

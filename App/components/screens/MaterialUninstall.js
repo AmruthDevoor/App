@@ -21,6 +21,7 @@ import {
   import AsyncStorage from "@react-native-async-storage/async-storage";
   import { MaterialIcons } from "@expo/vector-icons";
   import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
   // import MyTabs from "./BottomTab";
   const { width, height } = Dimensions.get("window");
   
@@ -52,7 +53,7 @@ import {
     const getProductInstall = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productlog/v1/getProductInstallationsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+        url: `${BaseUrl}/productlog/v1/getProductInstallationsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,

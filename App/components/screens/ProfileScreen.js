@@ -6,6 +6,7 @@ import Footer from "./Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Button, Card, Paragraph, Title } from "react-native-paper";
+import BaseUrl from "../api/BaseUrl";
 const {width, height} = Dimensions.get("window");
 //what
 const ProfileScreen = () => {
@@ -34,7 +35,7 @@ const ProfileScreen = () => {
 
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/login/login/v1/getTechnicianProfileByUserName/{userName}?userName=${userName}`,
+      url: `${BaseUrl}/login/login/v1/getTechnicianProfileByUserName/{userName}?userName=${userName}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -55,7 +56,7 @@ const ProfileScreen = () => {
 
   var SampleNameArray = { name: "Sarvana" };
   const imageUrl =
-    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
+    "https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/downloadFile/?filePath=";
   return (
     <View>
      
@@ -172,7 +173,7 @@ const ProfileScreen = () => {
 export default ProfileScreen;
 const styles = StyleSheet.create({
   footer: {
-  
+  zIndex:1,
     marginTop:height-1240,
   },
   text: {

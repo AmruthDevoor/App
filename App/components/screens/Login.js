@@ -85,9 +85,9 @@ const Login = ({ navigation }) => {
             AsyncStorage.setItem("AccessToken",JSON.stringify( result.data.token));
             
             
-            navigation.replace("HomeScreen");
+            navigation.replace("Alerts");
           }
-          else {Alert.alert("Bad Credentials")}
+          else {Alert.alert(result.data.errorMessage)}
         })
         .catch((err) => {
     

@@ -77,7 +77,7 @@ export default ProductRequest;
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   footer: {
-    marginTop: -55,
+    marginTop: -62,
   },
   button: {
     backgroundColor: "#0073A9",

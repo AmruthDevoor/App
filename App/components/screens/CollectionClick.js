@@ -21,6 +21,7 @@ import Header from "../AppHeader";
 import axios from "axios";
 import { Card } from "react-native-paper";
 import moment from "moment";
+import BaseUrl from "../api/BaseUrl";
 
 const CollectionClick = () => {
   const [accessToken, setAccessToken] = useState("");
@@ -43,6 +44,8 @@ const CollectionClick = () => {
   const [photo, setPhoto] = useState("");
   const [status, setStatus] = useState("");
   const [filePath, setFilePath] = useState("");
+  const [filePath1, setFilePath1] = useState("");
+  const [filePath2, setFilePath2] = useState("");
   const [insertedDate, setInsertedDate] = useState("");
 
   useEffect(() => {
@@ -62,7 +65,7 @@ const CollectionClick = () => {
   const getCollectiontaskId = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/planthealthtask/v1/getAllPlantHealthTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
+      url: `${BaseUrl}/collectiontask/v1/getAllCollectionTaskByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -74,7 +77,7 @@ const CollectionClick = () => {
   const getServicePlantTask = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/collectiontask/v1/getTechnicianCollectionTaskByCollectiontaskId/{collectiontaskId}?collectiontaskId=${collectiontaskId}`,
+      url: `${BaseUrl}/collectiontask/v1/getTechnicianCollectionTaskByCollectiontaskId/{collectiontaskId}?collectiontaskId=${collectiontaskId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -83,7 +86,7 @@ const CollectionClick = () => {
       console.warn(result.data);
       var taskCollectionData = result.data;
 
-      setServiceDate(moment(taskCollectionData.serviceDate).format("L"));
+      setServiceDate(moment(taskCollectionData.serviceDate).format("LL"));
       setPreviousVolumeReading(taskCollectionData.previousVolumeReading);
       setCurrentVolumeReading(taskCollectionData.currentVolumeReading);
       setPreviousRechargeReading(taskCollectionData.previousRechargeReading);
@@ -98,13 +101,15 @@ const CollectionClick = () => {
       setPhoto(taskCollectionData.photo);
       setStatus(taskCollectionData.status);
       setRemark(taskCollectionData.remark);
-      setInsertedDate(moment(taskCollectionData.insertedDate).format("L"));
-      setFilePath(taskCollectionData.readingPhotoPath);
+      setInsertedDate(moment(taskCollectionData.insertedDate).format("LL"));
+      setFilePath(taskCollectionData.volumeReadingPhotoPath);
+      setFilePath1(taskCollectionData.rechargeReadingPhotoPath);
+      setFilePath2(taskCollectionData.coinReadingPhotoPath);
     });
   };
 
   const imageUrl =
-    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
+    "https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/downloadFile/?filePath=";
   console.warn(filePath);
   return (
     <View>
@@ -164,6 +169,62 @@ const CollectionClick = () => {
                       borderColor: "black",
                     }}
                     source={{uri:imageUrl+filePath}}
+                    
+                  />
+                )}
+              </View>
+            </View>
+            <View>
+              <Text style={Styles.text}>Recharge Reading Image : </Text>
+              <View>
+                {/* <Image  /> */}
+                {filePath2 === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+filePath1}}
+                    
+                  />
+                )}
+              </View>
+            </View>
+            <View>
+              <Text style={Styles.text}>Coin Reading Image : </Text>
+              <View>
+                {/* <Image  /> */}
+                {filePath2 === null ? (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={require("../../assets/noImage.jpg")}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      width: 130,
+                      height: 130,
+                      borderWidth: 2,
+                      borderColor: "black",
+                    }}
+                    source={{uri:imageUrl+filePath2}}
                     
                   />
                 )}

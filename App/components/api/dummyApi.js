@@ -11,7 +11,7 @@ export const get_user = async (data) => {
       },
     };
     fetch(
-      `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/login/login/v1/getTechnicianProfileByUserName/${userName}`,
+      `https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/login/login/v1/getTechnicianProfileByUserName/${userName}`,
       result
     )
       .then((response) => response.json())

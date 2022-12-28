@@ -47,32 +47,38 @@ const ProductStock = () => {
   return (
     <View style={{ flex: 1,}}>
       <Header/>
-      <View>
-        <Card style={styles.card}>
-        <Text style={styles.head}>Product Stock</Text>  
-    <DataTable style={styles.container}>
-    <DataTable.Header style={styles.tableHeader}>
-    <DataTable.Title >Product</DataTable.Title>
-        <DataTable.Title  numeric><Text>Total Quantity</Text></DataTable.Title>
-        <DataTable.Title  numeric>Current Quantity</DataTable.Title>
-    </DataTable.Header>
-
-    {product.length <= 0 ? <Text>No Data Found</Text> : product.map((pro)=>{
-       return(
-
-    <DataTable.Row>
-    <DataTable.Cell textStyle={{width:170}}>{pro.productDto.productName}</DataTable.Cell>
-        <DataTable.Cell style={{marginLeft:-10}} numeric>{pro.totalQuantity}</DataTable.Cell>
-        <DataTable.Cell style={{marginRight:50}} numeric>{pro.currentQuantity}</DataTable.Cell>
-    </DataTable.Row>
-     )
-    })}
+ 
    
-  </DataTable>
-  </Card>
-  </View>
-  <View style={styles.footer}><Footer/></View>
-  </View>
+         <View>    
+      <Card style={styles.card}>
+        <Text style={styles.head}>Product Stock</Text>      
+      <DataTable style={styles.container}>
+      <DataTable.Header style={styles.tableHeader}>
+        <DataTable.Title style={styles.title1}>Product</DataTable.Title>
+        <DataTable.Title style={styles.title} numeric>t</DataTable.Title>
+        <DataTable.Title style={styles.title} numeric>c</DataTable.Title>
+      </DataTable.Header>
+     
+          
+                     {product.length <= 0 ? <Text>No Data Found</Text> : product.map((pro)=>{
+            return(
+             <DataTable.Row  >
+        <DataTable.Cell style={{backgroundColor:"red",paddingRight}}>{pro.productDto.productName}</DataTable.Cell>
+        <DataTable.Cell style={{backgroundColor:"blue",marginLeft:100}} numeric>{pro.totalQuantity}</DataTable.Cell>
+        <DataTable.Cell numeric>{pro.currentQuantity}</DataTable.Cell>
+      </DataTable.Row>
+                )
+        })}
+           
+            
+     
+  
+    </DataTable>
+    </Card>
+    </View>
+
+    <View style={styles.footer}><Footer/></View>
+    </View>
   )
 }
 
@@ -91,7 +97,7 @@ head:{
   paddingTop:10
   },
 container: {
-    padding: 0,
+    padding: 15,
   },
   tableHeader: {
     backgroundColor: 'skyblue',

@@ -19,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../AppHeader";
 import axios from "axios";
 import { useRef } from "react";
+import BaseUrl from "../api/BaseUrl";
 
 const MatReqAdd = () => {
   const navigation = useNavigation();
@@ -28,16 +29,18 @@ const MatReqAdd = () => {
 
   const [remark, setRemark] = useState("");
   const [isFocus, setIsFocus] = useState(false);
-  const[defaultMaterial,setDefaultMaterial]=useState({key:0, value:"select"})
+  const [defaultMaterial, setDefaultMaterial] = useState({
+    key: 0,
+    value: "select",
+  });
 
   const [accessToken, setAccessToken] = useState("");
 
   const [material, setMaterial] = useState([]);
-
+const[materialName,setMaterialName] = useState("");
   const [totQuan, setQuantity] = useState("");
-  const[show,setShow] = useState("")
+  const [show, setShow] = useState("");
   const [techId, setTechId] = useState("");
- 
 
   useEffect(() => {
     AsyncStorage.getItem("AccessToken").then((value) => {
@@ -47,13 +50,17 @@ const MatReqAdd = () => {
       setTechId(value);
     });
     getReqAdd();
-  }, [accessToken,techId,show]);
+  }, [accessToken, techId, show]);
 
-
-  const materialArray=[{id:0,name:"nothing to select"}]
-  const allMaterials =material.length <= 0 ? materialArray.map((m) =>{ return { key: m.id, value: m.name }}) : material.map((m) => {
-    return {key: m.materialId, value: m.materialName  };
-  });
+  const materialArray = [{ id: 0, name: "nothing to select" }];
+  const allMaterials =
+    material.length <= 0
+      ? materialArray.map((m) => {
+          return { key: m.id, value: m.name };
+        })
+      : material.map((m) => {
+          return { key: m.materialId, value: m.materialName };
+        });
   // const allMaterials = material.map((m) => {
   //   return { key: m.materialId, value: m.materialName };
   // });
@@ -61,18 +68,29 @@ const MatReqAdd = () => {
   const getReqAdd = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/material/v1/getAllMaterials`,
+      url: `${BaseUrl}/material/v1/getAllMaterials`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
       },
     }).then((result) => {
       setMaterial(result.data);
-      console.warn(result.data)
+      console.warn(result.data);
     });
   };
- 
- 
+  const getAMaterial = (id) => {
+    axios({
+      method: "GET",
+      url: ` ${BaseUrl}/material/v1/getMaterialByMaterialId/{materialId}?materialId=${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + accessToken,
+      },
+    }).then((result) => {
+      setMaterialName(result.data.materialName);
+    });
+  };
+
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -85,39 +103,47 @@ const MatReqAdd = () => {
   };
 
   const requestmaterial = (e) => {
-    if(totQuan===""){
-      Alert.alert("Please enter the quantity")}
-    else if(totQuan==0){
-        Alert.alert("Quantity cannot be 0")
-      }
-      else if(remark==="")
-      Alert.alert("Please enter the remark")
-      else{
-    e.preventDefault();
-    
+    if (materialName === "") {
+      Alert.alert("Please select the material");
+    }
+    else if (totQuan === "") {
+      Alert.alert("Please enter the quantity");
+    } else if (totQuan == 0) {
+      Alert.alert("Quantity cannot be 0");
+    } else if (remark === "") Alert.alert("Please enter the remark");
+    else {
+      e.preventDefault();
 
-    let data = {
-      materialDto: {
-        materialId: selected,
-      },
+      let data = {
+        materialDto: {
+          materialId: selected,
+        },
 
-      quantity: totQuan,
-      remark: remark,
-      technicianDto: {
-        technicianId: techId,
-      },
-    };
-    
-    axios({
-      method: "POST",
-      url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialrequest/v1/requestMaterial",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-      data: data,
-    }).then((res)=>{alert(res.data.message)}).then(()=>{navigation.navigate("MaterialRequest")});
-  }
+        quantity: totQuan,
+        remark: remark,
+        technicianDto: {
+          technicianId: techId,
+        },
+      };
+
+      axios({
+        method: "POST",
+        url: `${BaseUrl}/materialrequest/v1/requestMaterial`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+        data: data,
+      })
+        .then((res) => {
+          if(res.data.responseCode===201){
+            alert(res.data.message)}else if(res.data.responseCode===400){
+              alert(res.data.errorMessage)}
+        })
+        .then(() => {
+          navigation.navigate("MaterialRequest");
+        });
+    }
   };
   return (
     <View>
@@ -133,10 +159,11 @@ const MatReqAdd = () => {
             defaultOptions={defaultMaterial}
             setSelected={setSelected}
             data={allMaterials}
-            onSelect={() => alert(selected)}
+            onSelect={() => getAMaterial(selected)}
             placeholder="Select A Material"
           />
-          <Text style={{marginTop:20}}>Quantity : </Text>
+          <Text>MaterialName: {materialName}</Text>
+          <Text style={{ marginTop: 20 }}>Quantity : </Text>
           <TextInput
             placeholder="Quantity"
             value={totQuan}
@@ -144,20 +171,17 @@ const MatReqAdd = () => {
             onChangeText={(text) => {
               setQuantity(text);
             }}
-            
             style={Styles.inp}
           />
-         <Text  style={{marginTop:20}}>Remark : </Text>
+          <Text style={{ marginTop: 20 }}>Remark : </Text>
           <TextInput
             placeholder="Remark (max 150 Characters)"
             value={remark}
             onChangeText={(remk) => {
               setRemark(remk);
             }}
-         
             style={Styles.inp1}
           />
-          
         </SafeAreaView>
         <TouchableOpacity>
           <Pressable
@@ -166,8 +190,7 @@ const MatReqAdd = () => {
             }}
             style={Styles.submit}
           >
-            <Text style={Styles.btnText} >Submit
-            </Text>
+            <Text style={Styles.btnText}>Submit</Text>
           </Pressable>
         </TouchableOpacity>
       </View>

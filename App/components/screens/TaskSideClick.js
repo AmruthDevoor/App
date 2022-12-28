@@ -21,6 +21,7 @@ import Header from "../AppHeader";
 import axios from "axios";
 import { Card } from "react-native-paper";
 import moment from "moment";
+import BaseUrl from "../api/BaseUrl";
 
 const TaskSideClick = () => {
   const [accessToken, setAccessToken] = useState("");
@@ -54,7 +55,7 @@ const TaskSideClick = () => {
   const getTaskId = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getAllTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
+      url: `${BaseUrl}/task/v1/getAllTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=0&pageSize=5&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -66,7 +67,7 @@ const TaskSideClick = () => {
     
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getServiceTaskByTaskId/{taskId}?taskId=${taskId}`,
+      url: `${BaseUrl}/task/v1/getServiceTaskByTaskId/{taskId}?taskId=${taskId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -76,18 +77,18 @@ const TaskSideClick = () => {
       console.warn(result)
       var taskData = result.data;
 
-      setServiceDate(moment(taskData.serviceDate).format("L"))
+      setServiceDate(moment(taskData.serviceDate).format("LL"))
       setRemark(taskData.remark)
       setStatus(taskData.status)
       setOldpicPath(taskData.oldpicPath)
       setNewpicPath(taskData.newpicPath)
-      setInsertedDate(moment(taskData.insertedDate).format("L"))
+      setInsertedDate(moment(taskData.insertedDate).format("LL"))
     
     });
   };
   
   const imageUrl =
-    "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
+    "https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/downloadFile/?filePath=";
   return (
     <View>
        <Header />

@@ -13,6 +13,7 @@ import {
   Alert,
   Image,
 } from "react-native";
+import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -24,14 +25,22 @@ import axios from "axios";
 import { Navigation } from "react-native-navigation";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import BaseUrl from "../api/BaseUrl";
 
 const CollectionForm = () => {
   const [profileImage, setProfileImage] = useState("");
+  const [profileImage1, setProfileImage1] = useState("");
+  const [profileImage2, setProfileImage2] = useState("");
   const [progress, setProgress] = useState(0);
 const[display,setDisplay]=useState()
+const[display1,setDisplay1]=useState()
+
+const[display2,setDisplay2]=useState()
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [filename, setFilename] = useState();
+  const [filename1, setFilename1] = useState();
+  const [filename2, setFilename2] = useState();
   const [image, setImage] = useState(null);
   const [show, setShow] = useState(false);
   const [accessToken, setAccessToken] = useState("");
@@ -63,11 +72,8 @@ const[display,setDisplay]=useState()
     setDate(currentDate);
     let tempDate = new Date(currentDate);
     let fDate =
-      tempDate.getFullYear() +
-      "-" +
-      (tempDate.getMonth() + 1) +
-      "-" +
-      tempDate.getDate();
+      
+    tempDate.toLocaleDateString();
     setServiceDate(fDate);
   };
   const showMode = (currentMode) => {
@@ -96,7 +102,7 @@ const[display,setDisplay]=useState()
     console.warn("hey" + collectiontaskId);
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/collectiontask/v1/getCollectionTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/collectiontask/v1/getCollectionTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -109,7 +115,7 @@ const[display,setDisplay]=useState()
   const getCollectionByCollectionId = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/collectiontask/v1/getCollectionTaskByCollectiontaskId/{collectiontaskId}?collectiontaskId=${collectiontaskId}`,
+      url: `${BaseUrl}/collectiontask/v1/getCollectionTaskByCollectiontaskId/{collectiontaskId}?collectiontaskId=${collectiontaskId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -132,31 +138,35 @@ const[display,setDisplay]=useState()
   console.warn(previousBalance);
 
   const requestTask = (e) => {
-    if (previousVolumeReading === "") {
-      Alert.alert("Please Enter previous Volume Reading");
-    } else if (currentVolumeReading === "") {
+    if (serviceDate === "") {
+      Alert.alert("Please Enter the service Date");
+    }
+    else if (currentVolumeReading === "") {
       Alert.alert("Please Enter Current Volume Reading");
-    } else if (previousRechargeReading === "") {
-      Alert.alert("Please Enter Previous Recharge Reading");
-    } else if (currentRechargeReading === "") {
+    }  else if (currentRechargeReading === "") {
       Alert.alert("Please Enter Current Recharge Reading");
-    } else if (previousCoinReading === "") {
-      Alert.alert("Please Enter previous Coin Reading");
-    } else if (currentCoinReading === "") {
+    }  else if (currentCoinReading === "" ) {
       Alert.alert("Please Enter Current Coin Reading");
-    } else if (previousBalance === "") {
-      Alert.alert("Please Enter previous Balance");
-    } else if (newBalance === "") {
+    } else if (newBalance === "" ) {
       Alert.alert("Please Enter new Balance");
-    } else if (waterManSalary === "") {
+    } else if (waterManSalary === "" ) {
       Alert.alert("Please Enter water Man Salary");
     } else if (cashInHand === "") {
       Alert.alert("Please Enter cash In hand");
+    }
+    else if (display != "201") {
+      Alert.alert("Please select volume reading pic");
+    
+    }
+    else if (display1 != "201") {
+      Alert.alert("Please select recharge reading pic");
+    
+    }
+    else if (display2 != "201") {
+      Alert.alert("Please select coin reading pic");
+    
     } else if (remark === "") {
       Alert.alert("Please Enter remark");
-    
-    }else if (display != "201") {
-      Alert.alert("Please select pic");
     
     }
      else {
@@ -164,6 +174,7 @@ const[display,setDisplay]=useState()
 
       let data = {
         cashInHand: cashInHand,
+        coinReadingPhotoName: filename2,
         collectionTaskDto: {
           collectiontaskId: collectiontaskId,
         },
@@ -175,7 +186,9 @@ const[display,setDisplay]=useState()
         previousCoinReading: Number(previousCoinReading),
         previousRechargeReading: Number(previousRechargeReading),
         previousVolumeReading: Number(previousVolumeReading),
-        readingPhotoName: filename,
+       
+        rechargeReadingPhotoName: filename1,
+     
         remark: remark,
         serviceDate: serviceDate,
 
@@ -183,22 +196,26 @@ const[display,setDisplay]=useState()
           technicianId: techId,
         },
         waterManSalary: Number(waterManSalary),
+        volumeReadingPhotoName: filename,
       };
 
     
-      // console.warn(data);
+      console.warn(data);
       // var x={"cashInHand":cashhand}
       // data.push(x)
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/collectiontask/v1/postTechnicianCollectionTask",
+        url: `${BaseUrl}/collectiontask/v1/postTechnicianCollectionTask`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
         },
         data: data,
-      }).then((res) => {
-        alert(res.data.message);
+      }).then((res) => {if(res.data.responseCode===201){
+        alert(res.data.message)}else if(res.data.responseCode===400){
+          alert(res.data.errorMessage)
+        }
+      
         navigation.navigate("Collection");
       });
     }
@@ -214,6 +231,7 @@ const[display,setDisplay]=useState()
       const response = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -239,7 +257,8 @@ const[display,setDisplay]=useState()
     if (status === "granted") {
       const response = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: true,     
+        quality:0.2,
       });
       var fn = response.uri.substring(
         response.uri.lastIndexOf("/") + 1,
@@ -271,7 +290,7 @@ const[display,setDisplay]=useState()
     try {
       axios({
         method: "POST",
-        url: "https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/uploadFile",
+        url: `${BaseUrl}/file/uploadFile`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data; ",
@@ -279,6 +298,180 @@ const[display,setDisplay]=useState()
         },
       }).then((res) => {
         setDisplay(res.data.responseCode)
+        Alert.alert("Image Uploaded Successfully")
+       
+      
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+   
+  };
+  const pickImage1 = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality:0.2,
+      });
+      var fn1 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn1);
+      setFilename1(fn1);
+
+      if (!response.cancelled) {
+        setProfileImage1(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickCamera1 = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,     
+        quality:0.2,
+      });
+      var fn1 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn1);
+      setFilename1(fn1);
+
+      if (!response.cancelled) {
+        setProfileImage1(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const uploadImage1 = async () => {
+    console.warn({
+      name: filename1,
+      uri: profileImage1,
+      type: "image/jpg",
+    });
+
+    const formData = new FormData();
+    formData.append("file", {
+      name: filename1,
+      uri: profileImage1,
+      type: "image/jpg",
+    });
+    try {
+      axios({
+        method: "POST",
+        url: `${BaseUrl}/file/uploadFile`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data; ",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((res) => {
+        setDisplay1(res.data.responseCode)
+        Alert.alert("Image Uploaded Successfully")
+       
+      
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+   
+  };
+  const pickImage2 = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality:0.2,
+      });
+      var fn2 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn2);
+      setFilename2(fn2);
+
+      if (!response.cancelled) {
+        setProfileImage2(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const pickCamera2 = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+
+    if (status === "granted") {
+      const response = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,     
+        quality:0.2,
+      });
+      var fn2 = response.uri.substring(
+        response.uri.lastIndexOf("/") + 1,
+        response.uri.length
+      );
+      console.warn(fn2);
+      setFilename2(fn2);
+
+      if (!response.cancelled) {
+        setProfileImage2(response.uri);
+        console.warn(response.uri);
+        console.warn(response);
+      }
+    }
+  };
+  const uploadImage2 = async () => {
+    console.warn({
+      name: filename2,
+      uri: profileImage2,
+      type: "image/jpg",
+    });
+
+    const formData = new FormData();
+    formData.append("file", {
+      name: filename2,
+      uri: profileImage2,
+      type: "image/jpg",
+    });
+    try {
+      axios({
+        method: "POST",
+        url: `${BaseUrl}/file/uploadFile`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data; ",
+          Authorization: "Bearer " + accessToken,
+        },
+      }).then((res) => {
+        setDisplay2(res.data.responseCode)
         Alert.alert("Image Uploaded Successfully")
        
       
@@ -298,13 +491,13 @@ let resultRecharge=(currentRecharge-previousRecharge);
 let currentCoin=currentCoinReading;
 let previousCoin=previousCoinReading;
 let resultCoin=(currentCoin-previousCoin)
-let prevBal=previousBalance;
-let newBal=newBalance;
+let prevBal=(previousBalance-0);
+let cashhand=cashInHand;
 
 let watSal=waterManSalary
 
-var cashhand=parseInt(resultCoin)+parseInt(resultRecharge)+parseInt(prevBal)-parseInt(newBal)-parseInt(watSal)
-function xyz(){setCashInHand(cashhand)}
+var newBal=parseInt(resultRecharge)+parseInt(resultCoin)+parseInt(prevBal)-parseInt(watSal)-parseInt(cashhand)
+function xyz(){setNewBalance(newBal)}
 console.warn(cashhand)
   return (
     <ScrollView>
@@ -320,7 +513,7 @@ console.warn(cashhand)
               <Text style={{ fontSize: 20, marginBottom: 10 }}>
                 PlantName: {plantName}
               </Text>
-              <Text style={{ fontSize: 15 }}>Service Date: {serviceDate}</Text>
+              <Text style={{ fontSize: 15 }}>Service Date: {moment(serviceDate).format("YYYY-MM-DD")}</Text>
 
               <View style={{marginBottom:10}}>
                 <Button title="Service Date" onPress={() => showMode("date")} />
@@ -342,7 +535,7 @@ console.warn(cashhand)
               placeholder="previous Volume Reading"
               value={previousVolumeReading}
               keyboardType="numeric"
-              style={Styles.inp3}
+              style={Styles.pre}
             />
              <Text>Current Volume Reading : </Text>
             <TextInput
@@ -360,10 +553,8 @@ console.warn(cashhand)
               placeholder="Previous Recharge Reading"
               keyboardType="numeric"
               value={previousRechargeReading}
-              onChangeText={(previousRechargeReading) => {
-                setPreviousRechargeReading(previousRechargeReading);
-              }}
-              style={Styles.inp3}
+              
+              style={Styles.pre}
             />
             <Text>Current Recharge Reading : </Text>
             <TextInput
@@ -376,15 +567,76 @@ console.warn(cashhand)
               style={Styles.inp3}
             />
             <Text style={{marginBottom:20}}>Result Recharge Reading = {resultRecharge}</Text>
+            <Text>Recharge Reading Image : </Text>
+            
+            <Text style={{color:"white"}}>{display1}</Text>
+                        
+                        <View style={{ flexDirection: "row" }}>
+                        <Text
+                         
+                          style={{ borderWidth: 0.5,borderRadius:5, padding: 10,width:330,marginTop:-10 }}>
+                            
+                          {filename1}
+                          
+                          </Text>
+                          {display1=="201"?
+                          <Text>
+                          <MaterialIcons
+                              style={Styles.icon}
+                              name="done"
+                              size={30}
+                              color="green"
+                            />
+                          </Text>: ""}
+                          </View>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            onPress={pickImage1}
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="collections"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={pickCamera1}
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="photo-camera"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+            
+                          <TouchableOpacity
+                            onPress={uploadImage1}
+                            
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="file-upload"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+                         
+                        </View>
             <Text>Previous Coin Reading : </Text>
             <TextInput
               placeholder="Previous Coin Reading"
               keyboardType="numeric"
               value={previousCoinReading}
-              onChangeText={(previousCoinReading) => {
-                setPreviousCoinReading(previousCoinReading);
-              }}
-              style={Styles.inp3}
+            
+              style={Styles.pre}
             />
             <Text>Current Coin Reading : </Text>
             <TextInput
@@ -397,28 +649,82 @@ console.warn(cashhand)
               style={Styles.inp3}
             />
             <Text style={{marginBottom:20}}>Result Coin Reading = {resultCoin}</Text>
-            <Text style={{marginBottom:15}}>Total Collection = {resultRecharge+resultCoin}</Text>
+            <Text>Result Coin Image : </Text>
+            
+            <Text style={{color:"white"}}>{display2}</Text>
+                        
+                        <View style={{ flexDirection: "row" }}>
+                        <Text
+                         
+                          style={{ borderWidth: 0.5,borderRadius:5, padding: 10,width:330,marginTop:-10 }}>
+                            
+                          {filename2}
+                          
+                          </Text>
+                          {display2=="201"?
+                          <Text>
+                          <MaterialIcons
+                              style={Styles.icon}
+                              name="done"
+                              size={30}
+                              color="green"
+                            />
+                          </Text>: ""}
+                          </View>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            onPress={pickImage2}
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="collections"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={pickCamera2}
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="photo-camera"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+            
+                          <TouchableOpacity
+                            onPress={uploadImage2}
+                            
+                            style={Styles.buttonStyle}
+                            activeOpacity={0.5}
+                          >
+                            <MaterialIcons
+                              style={Styles.icon}
+                              name="file-upload"
+                              size={30}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+                         
+                        </View>
             <Text>Previous Balance : </Text>
             <TextInput
               placeholder="Previous Balance"
               keyboardType="numeric"
               value={previousBalance}
-              onChangeText={(previousBalance) => {
-                setPreviousBalance(previousBalance);
-              }}
-              style={Styles.inp3}
+             
+              style={Styles.pre}
             />
+            <Text style={{marginBottom:15}}>Total Collection = {resultRecharge+resultCoin+prevBal}</Text>
+            
+            
          
-             <Text>New Balance : </Text>
-            <TextInput
-              placeholder="New Balance"
-              keyboardType="numeric"
-              value={newBalance}
-              onChangeText={(newBalance) => {
-                setNewBalance(newBalance);
-              }}
-              style={Styles.inp3}
-            />
+            
              <Text>Waterman Salary : </Text>
             <TextInput
            
@@ -430,8 +736,8 @@ console.warn(cashhand)
               }}
               style={Styles.inp3}
             />
-             <Text style={{marginBottom:15}}>Cash In Hand = {cashInHand} </Text>
-            {/* <TextInput
+            <Text>Cash In Hand : </Text>
+            <TextInput
               placeholder="Cash In Hand"
               keyboardType="numeric"
               value={cashhand}
@@ -439,15 +745,17 @@ console.warn(cashhand)
                 setCashInHand(cashInHand);
               }}
               style={Styles.inp3}
-            /> */}
-            <Text>FileName : </Text>
+            />
+             <Text style={{marginBottom:20}}>New Balance : {newBal}</Text>
+           
+            <Text>Volume Reading Image : </Text>
             
-<Text>{display}</Text>
+<Text style={{color:"white"}}>{display}</Text>
             
             <View style={{ flexDirection: "row" }}>
             <Text
              
-              style={{ borderWidth: 0.5,borderRadius:5, padding: 10,width:330 }}>
+              style={{ borderWidth: 0.5,borderRadius:5, padding: 10,width:330,marginTop:-10 }}>
                 
               {filename}
               
@@ -599,6 +907,16 @@ const Styles = StyleSheet.create({
     height: 40,
     borderWidth: 0.19,
 
+    borderRadius: 3,
+    marginTop: 0,
+    marginBottom: 20,
+    paddingLeft: 10,
+  },
+
+  pre: {
+    height: 40,
+    borderWidth: 0.19,
+    backgroundColor:"#BEBEBE",
     borderRadius: 3,
     marginTop: 0,
     marginBottom: 20,

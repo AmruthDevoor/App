@@ -28,6 +28,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
 const wait = (timeout) => {
@@ -64,7 +65,7 @@ const MaterialRequest = () => {
   const getMaterialRequest = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/materialrequest/v1/getRequestedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `${BaseUrl}/materialrequest/v1/getRequestedMaterialsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,

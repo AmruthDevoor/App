@@ -6,6 +6,7 @@ import { Card, DataTable } from 'react-native-paper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import { MaterialIcons } from '@expo/vector-icons'
+import BaseUrl from '../api/BaseUrl'
 
 const Attendance = () => {
     const[techId,setTechId]=useState("")
@@ -32,7 +33,7 @@ const Attendance = () => {
       const getAttendance = () => {
         axios({
           method: "GET",
-          url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/attendance/v1/getAllAttendanceByPaginationAndTechnicianId/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+          url: `${BaseUrl}/attendance/v1/getAllAttendanceByPaginationAndTechnicianId/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + accessToken},

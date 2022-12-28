@@ -18,6 +18,7 @@ import {
 import { Card, Paragraph } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 
 const Collection = () => {
   const [techId, setTechId] = useState("");
@@ -46,7 +47,7 @@ const Collection = () => {
   const getTaskData = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/collectiontask/v1/getCollectionTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/collectiontask/v1/getCollectionTasksByTechnicianId/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -97,11 +98,11 @@ const Collection = () => {
                  <Card.Content style={{flexDirection:"row",paddingTop:10}} > 
                   <View >
                   <Text >
-                    Assigned Date: {moment(tsk.assigningDate).format("L")}
+                    Assigned Date: {moment(tsk.assigningDate).format("LL")}
                   </Text  >
                   </View>
                   <View >
-                  <Text style={{paddingLeft:30}}>DeadLine: {moment(tsk.deadlineDate).format("L")}</Text>
+                  <Text style={{paddingLeft:30}}>DeadLine: {moment(tsk.deadlineDate).format("LL")}</Text>
                   </View>
                 </Card.Content>
               </Card>
@@ -130,6 +131,22 @@ const Collection = () => {
         </Card.Content>
       </Card>
        */}
+         <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+     <Text></Text>
+    
+     <Text></Text>
         </View>
       </ScrollView>
       <View style={styles.footer}>

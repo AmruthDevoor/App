@@ -23,6 +23,7 @@ import axios from "axios";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PlantHealthCard from "../Cards/PlantHealthCard";
+import BaseUrl from "../api/BaseUrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -56,15 +57,15 @@ const HomeScreen = () => {
     });
     setTimeout(() => {
     setUpdate(!update)
-   }, 1000);
-   get_user();
+   }, 5000);
+
     totalCount();
     noOfTasksAndCollection();
   }, [accessToken,update]);
   const noOfTasksAndCollection = () => {
     axios({
       method: "GET", 
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/dashboard/v1/technicianDashboardPendingCount/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/dashboard/v1/technicianDashboardPendingCount/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -77,27 +78,12 @@ const HomeScreen = () => {
 
     });
   };
-  const get_user = () => {
-
-    axios({
-      method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/login/login/v1/getTechnicianProfileByUserName/{userName}?userName=${userName}`,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-    }).then((res) => {
   
-      
-    
-    });
-  };
-
 
   const totalCount = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/dashboard/v1/technicianDashboardCount/{technicianId}?technicianId=${techId}`,
+      url: `${BaseUrl}/dashboard/v1/technicianDashboardCount/{technicianId}?technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,

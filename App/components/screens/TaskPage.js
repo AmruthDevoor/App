@@ -33,6 +33,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -67,7 +68,7 @@ const TaskPage = () => {
   const getTaskPage = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/task/v1/getAllTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `${BaseUrl}/task/v1/getAllTasksByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -125,14 +126,14 @@ const viewItem = ({item}) => {
     <Card.Content style={{paddingTop:20}} >
       <Text>Ticket .No: {item.taskTicketNumber}</Text>
      </Card.Content>
-     <Card.Content style={{flexDirection:"row",paddingTop:10}} > 
+     <Card.Content style={{paddingTop:10}} > 
       <View >
       <Text >
-        Assigned Date: {moment(item.assigningDate).format("L")}
+        Assigned Date: {moment(item.assigningDate).format("LL")}
       </Text  >
       </View>
       <View >
-      <Text style={{paddingLeft:30}}>DeadLine: {moment(item.deadlineDate).format("L")}</Text>
+      <Text style={{paddingLeft:30}}>DeadLine: {moment(item.deadlineDate).format("LL")}</Text>
       </View>
     </Card.Content>
   </Card>

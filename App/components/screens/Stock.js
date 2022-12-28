@@ -48,7 +48,7 @@ export default Stock;
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   footer: {
-    marginTop: -40,
+    marginTop: -60,
   },
   button: {
     backgroundColor: "#0073A9",

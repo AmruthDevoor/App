@@ -23,6 +23,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
 
@@ -53,7 +54,7 @@ const LeaveRequest = () => {
   const getLeaveRequest = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/leave/v1/getRequestedLeaveByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `${BaseUrl}/leave/v1/getRequestedLeaveByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -86,12 +87,12 @@ const viewItem = ({item}) => {
       <Card.Content >   
      <Text style={styles.header}>{item.header==="" ? "No header":item.header}</Text>
      </Card.Content>
-     <View style={{ flexDirection: "row" }}>
-     <Card.Content style={{ flexDirection: "row" }}>   
-     <Text style={styles.content}>From Date :{moment(item.fromDate).format("L")}</Text>
+     <View >
+     <Card.Content >   
+     <Text style={styles.content}>From Date :{moment(item.fromDate).format("LL")}</Text>
      </Card.Content>
-     <Card.Content style={{ flexDirection: "row" }}>   
-     <Text style={styles.content1}>To Date : {moment(item.toDate).format("L")}</Text>
+     <Card.Content >   
+     <Text style={styles.content1}>To Date : {moment(item.toDate).format("LL")}</Text>
      </Card.Content>
      </View>
      <Card.Content style={styles.remark}>   

@@ -17,6 +17,7 @@ import {
   import Header from "../AppHeader";
   import axios from "axios";
   import { useRef } from "react";
+import BaseUrl from "../api/BaseUrl";
   
   const MatUninstReq = () => {
     const [value, setValue] = useState();
@@ -71,7 +72,7 @@ import {
     const getAllPlants = () => {
       axios({
         method: "GET",
-        url: ` https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/plant/v1/getAllPlants`,
+        url: `${BaseUrl}/plant/v1/getAllPlants`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -83,7 +84,7 @@ import {
     const getByProductHandoverId = (id) => {
       axios({
         method: "GET",
-        url: ` https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productassign/v1/getAssignedProductById/{productHandoverId}?productHandoverId=${id}`,
+        url: ` ${BaseUrl}/productassign/v1/getAssignedProductById/{productHandoverId}?productHandoverId=${id}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -95,7 +96,7 @@ import {
     const getAssignedProduct = () => {
       axios({
         method: "GET",
-        url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productassign/v1/getAllAssignedProducts/{technicianId}?technicianId=3`,
+        url: `${BaseUrl}/productassign/v1/getAllAssignedProducts/{technicianId}?technicianId=3`,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + accessToken,
@@ -141,13 +142,15 @@ import {
       
       axios({
           method:"POST",
-          url:"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productlog/v1/installProduct",
+          url:`${BaseUrl}/productlog/v1/installProduct`,
           headers: {
               "Content-Type": "application/json",
               Authorization: "Bearer " + accessToken,
             },
             data:data,
-      }).then((res)=>{console.warn(res)});
+      }).then((res)=>{if(res.data.responseCode===201){
+        alert(res.data.message)}else if(res.data.responseCode===400){
+          alert(res.data.errorMessage)}});
       alert("sucessfully Created")
       
     };

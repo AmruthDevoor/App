@@ -28,6 +28,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import BaseUrl from "../api/BaseUrl";
 // import MyTabs from "./BottomTab";
 const { width, height } = Dimensions.get("window");
 
@@ -58,7 +59,7 @@ const ProductUninstallation = () => {
   const getProductInstall = () => {
     axios({
       method: "GET",
-      url: `https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/productlog/v1/getProductUninstallationsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
+      url: `${BaseUrl}/productlog/v1/getProductUninstallationsByPagination/{pageNumber}/{pageSize}/{technicianId}?pageNumber=${pageNumber}&pageSize=${pageSize}&technicianId=${techId}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
@@ -85,7 +86,7 @@ const handleNextPage = () => {
     
 }
 const imageUrl =
-"https://rowaterplant.cloudjiffy.net/ROWaterPlantTechnician/file/downloadFile/?filePath=";
+"https://wallkinrowaterplant.cloudjiffy.net/rsenterprisestechnician/file/downloadFile/?filePath=";
   
 const viewItem = ({item}) => {
   return (
@@ -111,13 +112,13 @@ const viewItem = ({item}) => {
      <Text style={styles.content5}>Plant Name : {item.plantDto===null ? "No material name":item.plantDto.plantName}</Text>
      </Card.Content>
      <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>unInstallation Date : {moment(item.installationDate).format("L")}</Text>
+     <Text style={styles.content5}>unInstallation Date :{"\n"} {moment(item.installationDate).format("LL")}</Text>
      </Card.Content>
      <Card.Content style={styles.remark}>   
      <Text style={styles.content5}>Remark :{"\n"} {item.remark}</Text>
      </Card.Content>
      <Card.Content style={styles.remark}>   
-     <Text style={styles.content5}>Inserted Date : {moment(item.insertedDate).format("L")}</Text>
+     <Text style={styles.content5}>Inserted Date :{"\n"} {moment(item.insertedDate).format("LL")}</Text>
      </Card.Content>
      <View style={{flexDirection:"row", marginLeft:220,marginTop:-130,marginBottom:10}}>
                                    <Card.Content >
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
   remark: {},
   submit: {
     height: 40,
-    width: width - 300,
+    width: width - 290,
     backgroundColor: "#0073A9",
     borderRadius: 8,
     marginLeft: 280,
